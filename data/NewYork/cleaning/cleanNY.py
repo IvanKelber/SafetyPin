@@ -30,8 +30,6 @@ def main():
 		offense_index = header.index("Offense")
 		classification_index = header.index("Offense Classification")
 		borough_index = header.index("Borough")
-		xcoord_index = header.index("XCoordinate")
-		ycoord_index = header.index("YCoordinate")
 		location_index = header.index("Location 1")
 
 		#Headers
@@ -39,7 +37,7 @@ def main():
 		time_writer.writerow(["Time_ID","Hour","Minute"])
 		date_writer.writerow(["Date_ID","Day of Week","Month","Day","Year"])
 		offense_writer.writerow(["Offense_ID","Offense","Classification"])
-		location_writer.writerow(["Location_ID","Xcoord","Ycoord","Latitude","Longitude"])
+		location_writer.writerow(["Location_ID","Latitude","Longitude"])
 
 		#list of unique fields (for use in snowflake schema)
 		# date_list = {}
@@ -61,7 +59,6 @@ def main():
 		count = 0
 		for row in reader:
 			#need to remove occurrences before 2015 because of small sample size
-
 			if(eval(row[year_index]) >= 2015):
 				count += 1
 				ID = count
