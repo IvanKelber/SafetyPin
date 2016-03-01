@@ -1,17 +1,20 @@
 #!/usr/bin/env python
 import sys
 import csv
+import re
 import operator
 
 def main():
 	with open('../NewYorkMajorCrime.csv', 'rb') as ny, \
 	 open('../fact_table.csv','wb') as fact, \
 	 open('../time_table.csv', 'wb') as time, \
+	 open('../date_table.csv', 'wb') as date, \
 	 open('../location_table.csv','wb') as location, \
 	 open('../offense_table.csv','wb') as offense:
 		reader = csv.reader(ny)
 		fact_writer = csv.writer(fact)
 		time_writer = csv.writer(time)
+		date_writer = csv.writer(date)
 		location_writer = csv.writer(location)
 		offense_writer = csv.writer(offense)
 
@@ -32,8 +35,9 @@ def main():
 		location_index = header.index("Location 1")
 
 		#Headers
-		fact_writer.writerow(["ID","Date_ID","Offense_ID","Location_ID"])
-		time_writer.writerow(["Date_ID","Date","Day of Week","Month","Day","Year","Hour"])
+		fact_writer.writerow(["ID","Time_ID","Date_ID","Offense_ID","Location_ID"])
+		time_writer.writerow(["Time_ID","Hour","Minute"])
+		date_writer.writerow(["Date_ID","Day of Week","Month","Day","Year"])
 		offense_writer.writerow(["Offense_ID","Offense","Classification"])
 		location_writer.writerow(["Location_ID","Xcoord","Ycoord","Latitude","Longitude"])
 
@@ -49,63 +53,74 @@ def main():
 		# lat_list = []
 		# long_list = []
 
+		time_list = {}
 		date_list = {}
 		offense_list = {}
 		location_list = {}
 
-
+		count = 0
 		for row in reader:
-			ID = row[id_index]
-			#time
-			Date = row[date_index]
-			Day_of_Week = row[dow_index]
-			Month = row[month_index]
-			Day = row[day_index]
-			Year = row[year_index]
-			Hour = row[hour_index]
-			date_key = ','.join([Date,Day_of_Week,Month,Day,Year,Hour])
-			date_id = -1
-			try:
-				date_id = date_list[date_key]
-			except KeyError:
-				date_list[date_key] = len(date_list)
-				date_id = date_list[date_key]
-				time_writer.writerow([date_id,Date,Day_of_Week,Month,Day,Year,Hour])
-
-			
-			#offense (will be used for calculating severity)
-			Offense = row[offense_index]
-			Classification = row[classification_index]
-			offense_key = ','.join([Offense,Classification])
-			offense_id = -1
-			try:
-				offense_id = offense_list[offense_key]
-			except KeyError:
-				offense_list[offense_key] = len(offense_list)
-				offense_id = offense_list[offense_key]
-				offense_writer.writerow([offense_id,Offense,Classification])
-
-
-			#location
-			Xcoord = row[xcoord_index]
-			Ycoord = row[ycoord_index]
-			Location = eval(row[location_index])
-			Latitude = Location[0]
-			Longitude = Location[1]
-			location_key = ','.join([Xcoord,Ycoord,str(Location)])
-			location_id = -1
-			try:
-				location_id = location_list[location_key]
-			except KeyError:
-				location_list[location_key] = len(location_list)
-				location_id = location_list[location_key]
-				location_writer.writerow([location_id,Xcoord,Ycoord,Latitude,Longitude])
-
-
 			#need to remove occurrences before 2015 because of small sample size
-			#also need to remove Boroughs that are nil
-			if(eval(Year) >= 2015): 
-				fact_writer.writerow([ID,date_id,offense_id,location_id])
+
+			if(eval(row[year_index]) >= 2015):
+				count += 1
+				ID = count
+				#time
+				Date = row[date_index]
+				Hour = row[hour_index]
+				minute_pattern = re.compile(r'.*:(\d\d):\d\d.*')
+				Minute = minute_pattern.search(Date).group(1)
+				time_key = ','.join([Hour,Minute])
+				time_id = -1
+				try:
+					time_id = time_list[time_key]
+				except KeyError:
+					time_list[time_key] = len(time_list)
+					time_id = time_list[time_key]
+					time_writer.writerow([time_id,Hour,Minute])
+
+				
+				#date
+				Day_of_Week = row[dow_index]
+				Month = row[month_index]
+				Day = row[day_index]
+				Year = row[year_index]
+				date_key = ','.join([Day_of_Week,Month,Day,Year])
+				date_id = -1
+				try:
+					date_id = date_list[date_key]
+				except KeyError:
+					date_list[date_key] = len(date_list)
+					date_id = date_list[date_key]
+					date_writer.writerow([date_id,Day_of_Week,Month,Day,Year])
+
+				#offense (will be used for calculating severity)
+				Offense = row[offense_index]
+				Classification = row[classification_index]
+				offense_key = ','.join([Offense,Classification])
+				offense_id = -1
+				try:
+					offense_id = offense_list[offense_key]
+				except KeyError:
+					offense_list[offense_key] = len(offense_list)
+					offense_id = offense_list[offense_key]
+					offense_writer.writerow([offense_id,Offense,Classification])
+
+
+				#location
+				Location = eval(row[location_index])
+				Latitude = Location[0]
+				Longitude = Location[1]
+				location_key = ','.join([str(Location)])
+				location_id = -1
+				try:
+					location_id = location_list[location_key]
+				except KeyError:
+					location_list[location_key] = len(location_list)
+					location_id = location_list[location_key]
+					location_writer.writerow([location_id,Latitude,Longitude])
+	 
+				fact_writer.writerow([ID,time_id,date_id,offense_id,location_id])
 			
 
 	
