@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?><diagram program="umlet" version="12.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>410</x>
+      <y>290</y>
+      <w>160</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>Fact_Table
+--
+ID
+TIME_ID
+DATE_ID
+OFFENSE_ID
+GEO_LOCATION_ID
+CITY_ID
+INTERSECTION_ID_1
+INTERSECTION_ID_2
+--
+SUN_STATUS
+WEEKEND_STATUS
+SEASON_STATUS
+HOLIDAY_STATUS</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>670</x>
+      <y>200</y>
+      <w>110</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Time_Table
+--
+TIME_ID
+HOUR
+MINUTE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>710</x>
+      <y>530</y>
+      <w>160</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Offense_Table
+--
+OFFENSE_ID
+TYPE
+CLASSIFICATION</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>400</x>
+      <y>120</y>
+      <w>140</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>City_Table
+--
+CITY_ID
+CITY_NAME
+BOROUGH
+NEIGHBORHOOD</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>150</x>
+      <y>250</y>
+      <w>150</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>Date_Table
+--
+DATE_ID
+MONTH
+YEAR
+DAY
+DAY_OF_WEEK</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>430</x>
+      <y>660</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Intersection_Table
+--
+INTERSECTION_ID
+GEO_LOCATION_ID</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>90</x>
+      <y>550</y>
+      <w>170</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Geo_Location_Table
+--
+GEO_LOCATION_ID
+LATITUDE
+LONGITUDE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>540</x>
+      <y>460</y>
+      <w>190</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>30;30;170;120</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>440</x>
+      <y>200</y>
+      <w>60</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>30;30;40;90</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>230</x>
+      <y>590</y>
+      <w>220</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>30;30;200;100</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>230</x>
+      <y>430</y>
+      <w>200</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>30;160;180;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>470</x>
+      <y>500</y>
+      <w>50</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>30;30;30;160</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>540</x>
+      <y>260</y>
+      <w>150</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>130;30;30;120</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>270</x>
+      <y>300</y>
+      <w>150</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>30;30;130;90</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Actor</type>
+    <coordinates>
+      <x>680</x>
+      <y>130</y>
+      <w>100</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>
+bg=pink
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Actor</type>
+    <coordinates>
+      <x>180</x>
+      <y>180</y>
+      <w>100</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+bg=white</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Actor</type>
+    <coordinates>
+      <x>420</x>
+      <y>50</y>
+      <w>100</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+bg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Actor</type>
+    <coordinates>
+      <x>120</x>
+      <y>480</y>
+      <w>100</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Actor</type>
+    <coordinates>
+      <x>500</x>
+      <y>590</y>
+      <w>100</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+bg=cyan</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Actor</type>
+    <coordinates>
+      <x>760</x>
+      <y>460</y>
+      <w>100</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>fg=blue
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
