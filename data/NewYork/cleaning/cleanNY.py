@@ -3,8 +3,15 @@ import sys
 import csv
 import re
 import operator
+from apiclient.discovery import build
+
+api_key = ''
 
 def main():
+	with open('../../../api_keys/google_api_key.txt', 'rb') as api:
+		api_key = api.readline()
+
+	
 	with open('../NewYorkMajorCrime.csv', 'rb') as ny, \
 	 open('../fact_table.csv','wb') as fact, \
 	 open('../time_table.csv', 'wb') as time, \
