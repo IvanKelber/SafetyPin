@@ -14,7 +14,7 @@ def cleanCH():
 		new_writer.writeheader()
 
 		Category = ['THEFT','BATTERY','ASSAULT','WEAPONS VIOLATION','CRIM SEXUAL ASSAULT','OFFENSE INVOLVING CHILDREN',\
-		'ROBBERY','BURGLARY','HOMICIDE','HUMAN TRAFFICkING','SEX OFFENSE','ARSON'] #Categories we care about
+		'ROBBERY','BURGLARY','HOMICIDE','HUMAN TRAFFICKING','CRIM SEX OFFENSE','ARSON'] #Categories we care about
 
 		crimes = crimes[1:] #Excluding the header
 		index = 1
@@ -24,7 +24,7 @@ def cleanCH():
 			weekday = datetime.strptime(datime[0],"%m/%d/%Y").strftime('%A') #Compute day of week
 
 			if (crimes[crime][19] != '' or crimes[crime][20] != '') and crimes[crime][5] in Category:
-				new_writer.writerow({'ObjectID':index,'Offense':crimes[crime][5]+'-'+crimes[crime][6],'Day of week':weekday,'Date':datime[0],\
+				new_writer.writerow({'ObjectID':index,'Offense':crimes[crime][5],'Day of week':weekday,'Date':datime[0],\
 					'Time':datime[1][:len(datime)+2],'Latitude':crimes[crime][19],'Longitude':crimes[crime][20]}) #Write row to csv
 				index += 1
 
@@ -46,7 +46,7 @@ def cleanCH():
 	open('../time_table.csv','wb') as time,\
 	open('../fact_table.csv','wb') as fact:
 
-		offense_fields = ["Offense_ID","Offense","Classification"]
+		offense_fields = ["Offense_ID","Offense"]
 		location_fields = ["Location_ID","Latitude","Longitude"]
 		date_fields = ["Date_ID","Day of Week","Month","Day","Year"]
 		time_fields = ["Time_ID","Hour","Minute"]
