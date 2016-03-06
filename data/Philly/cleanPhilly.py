@@ -27,7 +27,7 @@ def main():
         #month_index = header.index("Occurrence Month")  # Philly CSV doesn't include
         #day_index = header.index("Occurrence Day")  # Philly CSV doesn't include
         offense_index = header.index("General Crime Category")
-        classification_index = header.index("PSA") # 1 = Violent, 2 = Non-Violent
+        #classification_index = header.index("Classification" # Philly CSV doesn't include
         #borough_index = header.index("Borough") # Philly CSV doesn't include
         location_index = header.index("Coordinates")
 
@@ -37,17 +37,6 @@ def main():
         date_writer.writerow(["Date_ID","Day of Week","Month","Day","Year"])
         offense_writer.writerow(["Offense_ID","Offense","Classification"])
         location_writer.writerow(["Location_ID","Latitude","Longitude"])
-
-        #list of unique fields (for use in snowflake schema)
-        # date_list = {}
-        # dow_list = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-        # month_list = set(["January","February","March","April","May","June",\
-        # "July","August","September","October","November","December"])
-
-        # x_list = []
-        # y_list = []
-        # lat_list = []
-        # long_list = []
 
         time_list = {}
         date_list = {}
@@ -61,6 +50,7 @@ def main():
 
             #time
             datetime = row[date_index].split()
+            date = datetime[0].split('/')
             time = datetime[1].split(':')
             flag = datetime[2]
 
@@ -78,22 +68,39 @@ def main():
                 time_id = time_list[time_key]
                 time_writer.writerow([time_id,Hour,Minute])
 
+            #date
+            #Day_of_Week = row[dow_index]
+            Day_of_Week = -99 # DEBUG
+            Month = date[0]
+            Day = date[1]
+            Year = date[2]
+            date_key = ','.join([Day_of_Week,Month,Day,Year])
+            #date_key = ','.join([Month,Day,Year])
+            date_id = -1
+            try:
+                date_id = date_list[date_key]
+            except KeyError:
+                date_list[date_key] = len(date_list)
+                date_id = date_list[date_key]
+                date_writer.writerow([date_id,Day_of_Week,Month,Day,Year])
+
 
             #offense (will be used for calculating severity)
             Offense = row[offense_index]
-            Classification = row[classification_index]
-            offense_key = ','.join([Offense,Classification])
-            offense_id = -1
-            try:
-                offense_id = offense_list[offense_key]
-            except KeyError:
-                offense_list[offense_key] = len(offense_list)
-                offense_id = offense_list[offense_key]
-                offense_writer.writerow([offense_id,Offense,Classification])
+            #Classification = row[classification_index]
+            Classification = -99 # DEBUG
+	        offense_key = ','.join([Offense,Classification])
+	        offense_id = -1
+	        try:
+	            offense_id = offense_list[offense_key]
+	        except KeyError:
+	            offense_list[offense_key] = len(offense_list)
+	            offense_id = offense_list[offense_key]
+	            offense_writer.writerow([offense_id,Offense,Classification])
 
             #location
             Location = row[location_index]
-            if Location != '':
+            if Location != '': # Exclude records without location info
                 coords_pattern = re.compile(r'\(([-0-9\.]*)\, ([-0-9\.]*)\)')
                 Latitude = coords_pattern.search(Location).group(1)
                 Longitude = coords_pattern.search(Location).group(2)
@@ -106,21 +113,6 @@ def main():
                     location_id = location_list[location_key]
                     location_writer.writerow([location_id,Latitude,Longitude])
 
-            '''#date - NOT DONE YET
-            Day_of_Week = row[dow_index]
-            Month = row[month_index]
-            Day = row[day_index]
-            Year = row[year_index]
-            date_key = ','.join([Day_of_Week,Month,Day,Year])
-            date_id = -1
-            try:
-                date_id = date_list[date_key]
-            except KeyError:
-                date_list[date_key] = len(date_list)
-                date_id = date_list[date_key]
-                date_writer.writerow([date_id,Day_of_Week,Month,Day,Year])'''
-
-            date_id = 'temporary'
             fact_writer.writerow([ID,time_id,date_id,offense_id,location_id])
 
 
