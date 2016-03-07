@@ -50,7 +50,10 @@ def main():
 
             #time
             datetime = row[date_index].split()
+            print datetime[0] # DEBUG
             date = datetime[0].split('/')
+            print date # DEBUG
+            bomb2
             time = datetime[1].split(':')
             flag = datetime[2]
 
@@ -89,18 +92,18 @@ def main():
             Offense = row[offense_index]
             #Classification = row[classification_index]
             Classification = -99 # DEBUG
-	        offense_key = ','.join([Offense,Classification])
-	        offense_id = -1
-	        try:
-	            offense_id = offense_list[offense_key]
-	        except KeyError:
-	            offense_list[offense_key] = len(offense_list)
-	            offense_id = offense_list[offense_key]
-	            offense_writer.writerow([offense_id,Offense,Classification])
+            offense_key = ','.join([Offense,Classification])
+            offense_id = -1
+            try:
+                offense_id = offense_list[offense_key]
+            except KeyError:
+                offense_list[offense_key] = len(offense_list)
+                offense_id = offense_list[offense_key]
+                offense_writer.writerow([offense_id,Offense,Classification])
 
             #location
             Location = row[location_index]
-            if Location != '': # Exclude records without location info
+            if Location != '': # Exclude records without location info # THIS IS NOT THE RIGHT PLACE FOR THIS
                 coords_pattern = re.compile(r'\(([-0-9\.]*)\, ([-0-9\.]*)\)')
                 Latitude = coords_pattern.search(Location).group(1)
                 Longitude = coords_pattern.search(Location).group(2)
