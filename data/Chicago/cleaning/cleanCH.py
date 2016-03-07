@@ -14,7 +14,7 @@ def cleanCH():
 		new_writer.writeheader()
 
 		Category = ['THEFT','BATTERY','ASSAULT','WEAPONS VIOLATION','CRIM SEXUAL ASSAULT','OFFENSE INVOLVING CHILDREN',\
-		'ROBBERY','BURGLARY','HOMICIDE','HUMAN TRAFFICKING','CRIM SEX OFFENSE','ARSON'] #Categories we care about
+		'ROBBERY','BURGLARY','HOMICIDE','CRIM SEX OFFENSE'] #Categories we care about
 
 		crimes = crimes[1:] #Excluding the header
 		index = 1
