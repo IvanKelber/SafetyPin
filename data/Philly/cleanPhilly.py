@@ -50,12 +50,9 @@ def main():
 
             #time
             datetime = row[date_index].split()
-            print datetime[0] # DEBUG
-            date = datetime[0].split('/')
-            print date # DEBUG
-            bomb2
             time = datetime[1].split(':')
             flag = datetime[2]
+            datetime = ' '.join(datetime)
 
             if flag == 'AM':
                 Hour = str(int(time[0])*100)
@@ -74,11 +71,11 @@ def main():
             #date
             #Day_of_Week = row[dow_index]
             Day_of_Week = -99 # DEBUG
-            Month = date[0]
-            Day = date[1]
-            Year = date[2]
-            date_key = ','.join([Day_of_Week,Month,Day,Year])
-            #date_key = ','.join([Month,Day,Year])
+            date_pattern = re.compile(r'([0-9]*)\/([0-9]*)\/([0-9]*)')
+            Month = date_pattern.search(datetime).group(1)
+            Day = date_pattern.search(datetime).group(2)
+            Year = date_pattern.search(datetime).group(3)
+            date_key = ','.join([str(Day_of_Week),str(Month),str(Day),str(Year)])
             date_id = -1
             try:
                 date_id = date_list[date_key]
@@ -87,12 +84,11 @@ def main():
                 date_id = date_list[date_key]
                 date_writer.writerow([date_id,Day_of_Week,Month,Day,Year])
 
-
             #offense (will be used for calculating severity)
             Offense = row[offense_index]
             #Classification = row[classification_index]
             Classification = -99 # DEBUG
-            offense_key = ','.join([Offense,Classification])
+            offense_key = ','.join([Offense,str(Classification)])
             offense_id = -1
             try:
                 offense_id = offense_list[offense_key]
