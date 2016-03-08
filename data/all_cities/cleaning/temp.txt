@@ -1,0 +1,45 @@
+		###CLEANING OFFENSE
+		with open('../offense/ny_offense_table.csv', "rb") as ny_offense, \
+		open('../offense/chi_offense_table.csv', "rb") as chi_offense, \
+		open('../offense/all_offense_table.csv', 'wb') as all_offense:
+	  		ny_reader = csv.reader(ny_offense)
+
+			
+			next(ny_reader,None)
+			count = 0
+			for row in ny_offense:
+				r = row.split(',')
+				r[-1] = r[-1].strip()
+				offense_dict[str(r[1:])] = count
+				count += 1
+
+	  		chi_reader = csv.reader(chi_offense)
+
+			next(chi_reader,None)
+			for row in chi_offense:
+				r = row.split(',')
+				r[-1] = r[-1].strip()
+				try:
+					offense_old_new_id[r[0]] = offense_dict[str(r[1:])]
+				except KeyError:
+					offense_dict[str(r[1:])] = count
+					offense_old_new_id[r[0]] = count
+					count += 1
+
+
+			all_offense_writer = csv.writer(all_offense)
+			for key in offense_dict:
+				k = eval(key)
+				all_offense_writer.writerow([offense_dict[key]] + k)		
+
+			ny_fact_reader = csv.reader(ny_fact)
+			all_fact_writer = csv.writer(all_fact)
+
+			size = -1
+			for row in ny_fact_reader:
+				size += 1
+				all_fact_writer.writerow(row)
+
+			chi_fact_reader = csv.reader(chi_fact)
+			next(chi_fact_reader,None)
+
