@@ -50,8 +50,8 @@ def cleanCH():
 		location_fields = ["Location_ID","Latitude","Longitude"]
 		date_fields = ["Date_ID","Day of Week","Month","Day","Year"]
 		time_fields = ["Time_ID","Hour","Minute"]
-		fact_fields = ["ID","Time_ID","Date_ID","Offense_ID","Location_ID"]
-
+		fact_fields = ["ID","City_ID","Time_ID","Date_ID","Offense_ID","Location_ID"]
+                
 		offense_writer = csv.DictWriter(offense,offense_fields)
 		location_writer = csv.DictWriter(location,location_fields)
 		date_writer = csv.DictWriter(date,date_fields)
@@ -102,12 +102,11 @@ def cleanCH():
 				time_writer.writerow({'Time_ID':time_id,'Hour':hour,'Minute':minute})
 				time_id += 1
 
-
 			fact_offenseid = offenses[crimes[crime][1]]
 			fact_locationid = locations[locationpair]
 			fact_dateid = dates[date_entry]
 			fact_timeid = times[time_entry]
-			fact_writer.writerow({'ID':crimes[crime][0],'Time_ID':fact_timeid,'Date_ID':fact_dateid,'Offense_ID':fact_offenseid,'Location_ID':fact_locationid}) #Write into fact table
+			fact_writer.writerow({'ID':crimes[crime][0],'City_ID':2,'Time_ID':fact_timeid,'Date_ID':fact_dateid,'Offense_ID':fact_offenseid,'Location_ID':fact_locationid}) #Write into fact table
 
 
 
