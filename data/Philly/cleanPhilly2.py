@@ -7,11 +7,11 @@ import re
 
 def main():
 
-    # Start by defining the categories we care about
-    Category = ['THEFT','BATTERY','ASSAULT','WEAPONS VIOLATION','CRIM SEXUAL ASSAULT','OFFENSE INVOLVING CHILDREN',\
-    'ROBBERY','BURGLARY','HOMICIDE','CRIM SEX OFFENSE']
+    ##################################################################
+    # Open raw data file, filter and clean, and re-save as a new csv #
+    ##################################################################
 
-    # Then manually define a dictionary of Philly UCR codes to those categories
+    # Start by defining a dictionary of Philly UCR codes to those categories
     # (Excluding any UCR codes for categories we don't care about)
     PhillyUCR = {}
     PhillyUCR[100] = 'HOMICIDE'
@@ -19,8 +19,7 @@ def main():
     PhillyUCR[300] = 'ROBBERY'
     PhillyUCR[400] = 'ASSAULT'
     PhillyUCR[500] = 'BURGLARY'
-    PhillyUCR[600] = 'THEFT'
-    PhillyUCR[700] = 'THEFT'
+    PhillyUCR[600] = 'THEFT' # includes theft FROM motor vehicle but not theft OF motor vehicle
     PhillyUCR[800] = 'ASSAULT'
     #PhillyUCR[1400] = 'VANDALISM'
     PhillyUCR[1500] = 'WEAPONS VIOLATION'
@@ -60,7 +59,9 @@ def main():
                     'Time':datime[1][:len(datime)+2],'Latitude':latitude,'Longitude':longitude}) #Write row to csv
                 index += 1
 
-    ##########################################################################################
+    ###################################################################
+    # Open cleaned csv and create fact and dim tables from our schema #
+    ###################################################################
 
     city_ID = 5
 
@@ -74,7 +75,6 @@ def main():
     date_id = 0
     time_id = 0
 
-    # Creating tables based on schema
     with open('CrimePhilly.csv','rb') as crimedata,\
     open('offense_table.csv','wb') as offense,\
     open('location_table.csv','wb') as location,\
@@ -143,6 +143,7 @@ def main():
             fact_dateid = dates[date_entry]
             fact_timeid = times[time_entry]
             fact_writer.writerow({'ID':crimes[crime][0],'City_ID':city_ID,'Time_ID':fact_timeid,'Date_ID':fact_dateid,'Offense_ID':fact_offenseid,'Location_ID':fact_locationid}) #Write into fact table
+
 
 if __name__ == '__main__':
     main()
