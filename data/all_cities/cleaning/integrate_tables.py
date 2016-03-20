@@ -12,9 +12,9 @@ def main():
 
 	#open fact tables
 
-	with open('../facts/merged_fact_table.csv', "rb") as ny_fact, \
-	open('../facts/bo_fact_table.csv', "rb") as chi_fact, \
-	open('../facts/merged2_fact_table.csv','a+') as ny_chi_fact:
+	with open('../facts/merged2_fact_table.csv', "rb") as ny_fact, \
+	open('../facts/de_fact_table.csv', "rb") as chi_fact, \
+	open('../facts/all_fact_table.csv','a+') as ny_chi_fact:
 
 		#determine which tables we update
 		#TODO this part ^^
@@ -37,9 +37,9 @@ def main():
 		location_id = -1
 
 		###CLEANING DATE
-		with open('../date/merged_date_table.csv', "rb") as ny_date, \
-		open('../date/bo_date_table.csv', "rb") as chi_date, \
-		open('../date/merged2_date_table.csv', 'wb') as ny_chi_date:
+		with open('../date/merged2_date_table.csv', "rb") as ny_date, \
+		open('../date/de_date_table.csv', "rb") as chi_date, \
+		open('../date/all_date_table.csv', 'wb') as ny_chi_date:
 
 	  		ny_reader = csv.reader(ny_date)
 
@@ -78,9 +78,9 @@ def main():
 
 
 		###CLEANING TIME
-		with open('../time/merged_time_table.csv', "rb") as ny_time, \
-		open('../time/bo_time_table.csv', "rb") as chi_time, \
-		open('../time/merged2_time_table.csv', 'wb') as ny_chi_time:
+		with open('../time/merged2_time_table.csv', "rb") as ny_time, \
+		open('../time/de_time_table.csv', "rb") as chi_time, \
+		open('../time/all_time_table.csv', 'wb') as ny_chi_time:
 	  		ny_reader = csv.reader(ny_time)
 
 			
@@ -117,9 +117,9 @@ def main():
 
 
 		###CLEANING OFFENSE
-		with open('../offense/merged_offense_table.csv', "rb") as ny_offense, \
-		open('../offense/bo_offense_table.csv', "rb") as chi_offense, \
-		open('../offense/merged2_offense_table.csv', 'wb') as ny_chi_offense:
+		with open('../offense/merged2_offense_table.csv', "rb") as ny_offense, \
+		open('../offense/de_offense_table.csv', "rb") as chi_offense, \
+		open('../offense/all_offense_table.csv', 'wb') as ny_chi_offense:
 	  		ny_reader = csv.reader(ny_offense)
 
 			
@@ -155,9 +155,9 @@ def main():
 
 
 		###CLEANING LOCATION
-		with open('../location/merged_location_table.csv', "rb") as ny_location, \
-		open('../location/bo_location_table.csv', "rb") as chi_location, \
-		open('../location/merged2_location_table.csv', 'wb') as ny_chi_location:
+		with open('../location/merged2_location_table.csv', "rb") as ny_location, \
+		open('../location/de_location_table.csv', "rb") as chi_location, \
+		open('../location/all_location_table.csv', 'wb') as ny_chi_location:
 	  		ny_reader = csv.reader(ny_location)
 
 			
