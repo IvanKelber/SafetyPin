@@ -59,6 +59,8 @@ def main():
 				#time
 				Date = row[date_index]
 				Hour = row[hour_index]
+				if(Hour[0] == '0'):
+					Hour = Hour[1:]
 				minute_pattern = re.compile(r'.*:(\d\d):\d\d.*')
 				Minute = minute_pattern.search(Date).group(1)
 				time_key = ','.join([Hour,Minute])
@@ -93,7 +95,7 @@ def main():
 				elif(Offense == 'FELONY ASSAULT'):
 					Offense = 'ASSAULT'
 				elif('LARCENY' in Offense):
-					Offense = 'LARCENY'
+					Offense = 'THEFT'
 				elif(Offense == 'MURDER'):
 					Offense = 'HOMICIDE'
 				offense_key = ','.join([Offense])
