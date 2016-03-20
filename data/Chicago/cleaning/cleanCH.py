@@ -8,7 +8,9 @@ def cleanCH():
 	with open('../CrimeChicago.csv','rb') as crimedata:
 		crimes = list(crimedata.read().splitlines())
 
-	with open('../CrimeChicago2015.csv','wb') as crimedata:
+	print crimes
+
+	with open('../CrimeChicago2016.csv','wb') as crimedata:
 		fieldnames = ['ObjectID','Offense','Day of week','Date','Time','Latitude','Longitude']
 		new_writer = csv.DictWriter(crimedata,fieldnames)
 		new_writer.writeheader()
@@ -16,14 +18,14 @@ def cleanCH():
 		Category = ['THEFT','BATTERY','ASSAULT','WEAPONS VIOLATION','CRIM SEXUAL ASSAULT','OFFENSE INVOLVING CHILDREN',\
 		'ROBBERY','BURGLARY','HOMICIDE','CRIM SEX OFFENSE'] #Categories we care about
 
-		crimes = crimes[1:] #Excluding the header
+		crimes = crimes[1:] #Excluding the head
 		index = 1
 		for crime in range(len(crimes)): 
 			crimes[crime] = crimes[crime].split(',')
 			datime = crimes[crime][2].split()
 			weekday = datetime.strptime(datime[0],"%m/%d/%Y").strftime('%A') #Compute day of week
-
-			if (crimes[crime][19] != '' or crimes[crime][20] != '') and crimes[crime][5] in Category:
+			break
+			if (crimes[crime][19] != '' or crimes[crime][20] != '') and crimes[crime][5] in Category and crimes[crime][17] == 2016:
 				new_writer.writerow({'ObjectID':index,'Offense':crimes[crime][5],'Day of week':weekday,'Date':datime[0],\
 					'Time':datime[1][:len(datime)+2],'Latitude':crimes[crime][19],'Longitude':crimes[crime][20]}) #Write row to csv
 				index += 1
@@ -39,12 +41,12 @@ def cleanCH():
 	time_id = 0
 
 	# Creating tables based on schema
-	with open('../CrimeChicago2015.csv','rb') as crimedata,\
-	open('../offense_table.csv','wb') as offense,\
-	open('../location_table.csv','wb') as location,\
-	open('../date_table.csv','wb') as date,\
-	open('../time_table.csv','wb') as time,\
-	open('../fact_table.csv','wb') as fact:
+	with open('../CrimeChicago2016.csv','rb') as crimedata,\
+	open('../offense_table_2016.csv','wb') as offense,\
+	open('../location_table_2016.csv','wb') as location,\
+	open('../date_table_2016.csv','wb') as date,\
+	open('../time_table_2016.csv','wb') as time,\
+	open('../fact_table_2016.csv','wb') as fact:
 
 		offense_fields = ["Offense_ID","Offense"]
 		location_fields = ["Location_ID","Latitude","Longitude"]
@@ -109,10 +111,10 @@ def cleanCH():
 			fact_writer.writerow({'ID':crimes[crime][0],'City_ID':2,'Time_ID':fact_timeid,'Date_ID':fact_dateid,'Offense_ID':fact_offenseid,'Location_ID':fact_locationid}) #Write into fact table
 
 
-
-
-
-
+##
+##
+##
+##
 
 
 cleanCH()
