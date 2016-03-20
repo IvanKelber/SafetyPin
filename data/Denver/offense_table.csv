@@ -1,8 +1,5 @@
 Offense_ID,Offense
-0,larceny
-1,public-disorder
-2,robbery
-3,all-other-crimes
-4,other-crimes-against-persons
-5,aggravated-assault
-6,murder
+0,THEFT
+1,ROBBERY
+2,ASSAULT
+3,HOMICIDE
