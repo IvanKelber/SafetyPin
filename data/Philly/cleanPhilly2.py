@@ -133,6 +133,9 @@ def main():
                 date_writer.writerow({'Date_ID':date_id,'Day of Week':crimes[crime][2],'Month':month,'Day':day,'Year':year})
                 date_id += 1
 
+            if hour == '0':
+                hour = '000'
+
             if time_entry not in times: #List of times
                 times[time_entry] = time_id
                 time_writer.writerow({'Time_ID':time_id,'Hour':hour,'Minute':minute})
