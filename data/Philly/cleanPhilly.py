@@ -116,6 +116,7 @@ def main():
             timeobj = crimes[crime][4].split(':') # Time object for hours and minutes
             hour = str(int(timeobj[0])*100)
             minute = timeobj[1]
+
             time_entry = ','.join([hour,minute]) #Entry as required by time_table
 
             if crimes[crime][1] not in offenses: #List of offenses 
@@ -133,8 +134,11 @@ def main():
                 date_writer.writerow({'Date_ID':date_id,'Day of Week':crimes[crime][2],'Month':month,'Day':day,'Year':year})
                 date_id += 1
 
-            if hour == '0':
+            if hour == '0': # Fix hour format
                 hour = '000'
+
+            if len(minute) == 1: # Fix minute format
+                minute = '0' + minute
 
             if time_entry not in times: #List of times
                 times[time_entry] = time_id
