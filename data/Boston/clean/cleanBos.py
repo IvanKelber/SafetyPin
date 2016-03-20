@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import *
 import csv
+
 
 
 
@@ -22,6 +23,10 @@ def cleanCH():
 			crimes[crime] = crimes[crime].split(",")
 			datime = crimes[crime][6].split()
 			weekday = datetime.strptime(datime[0],"%m/%d/%Y").strftime('%A') #Compute day of week
+			time = datime[1]+" "+ datime[2]
+			
+			in_time = datetime.strptime(time, "%I:%M:%S %p")
+			out_time = datetime.strftime(in_time, "%H:%M")
 			#print crimes[crime][19]
 			lati = crimes[crime][19].split("(")
 			#print lati[1]  
@@ -41,14 +46,14 @@ def cleanCH():
 				crimes[crime][2] = 'CRIM SEXUAL ASSAULT'
 			elif("WEAPONS" in crimes[crime][2].upper()):
 				crimes[crime][2] = 'WEAPONS VIOLATION'
-			
+
 
 			if ((lati[1] == '0.0' or latit[0] == '0.0')) or crimes[crime][2].upper() not in Category:
 				continue
 			else:
 				#print lati[1]+"   "+latit[0]
 				new_writer.writerow({'ObjectID':index,'Offense':crimes[crime][2].upper(),'Day of week':weekday,'Date':datime[0],\
-					'Time':datime[1][:len(datime)+2],'Latitude':lati[1],'Longitude':latit[0]}) #Write row to csv
+					'Time':out_time,'Latitude':lati[1],'Longitude':latit[0]}) #Write row to csv
 				index += 1
 
 	offenses = {}
