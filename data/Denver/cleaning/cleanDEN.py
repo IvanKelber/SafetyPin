@@ -101,6 +101,8 @@ def main():
 				time_writer.writerow({'Time_ID':time_id,'Hour':hour,'Minute':minute})
 				time_id += 1
 
+			if hour == '0':
+				hour = '000'
 
 			fact_offenseid = offenses[crimes[crime][1]]
 			fact_locationid = locations[locationpair]
