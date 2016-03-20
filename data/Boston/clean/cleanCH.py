@@ -14,7 +14,7 @@ def cleanCH():
 		new_writer.writeheader()
 
 		Category = ['THEFT','BATTERY','ASSAULT','WEAPONS VIOLATION','CRIM SEXUAL ASSAULT','OFFENSE INVOLVING CHILDREN',\
-		'ROBBERY','BURGLARY','HOMICIDE','CRIM SEX OFFENSE','MANSLAUGHTER','LARCENY'] #Categories we care about
+		'ROBBERY','BURGLARY','HOMICIDE','CRIM SEX OFFENSE','MANSLAUGHTER','LARCENY',"HATECRIM",""] #Categories we care about
 
 		crimes = crimes[1:] #Excluding the header
 		index = 1
@@ -27,11 +27,27 @@ def cleanCH():
 			#print lati[1]  
 			latit = crimes[crime][20].split(")")
 			#print lati[1]+"   "+latit[0]
-			if ((lati[1] == '0.0' or latit[0] == '0.0')) or crimes[crime][2] not in Category:
+			if("LARCENY" in crimes[crime][2].upper()):
+				crimes[crime][2] = 'THEFT'
+			elif("ASSAULT" in crimes[crime][2].upper()):
+				crimes[crime][2] = 'ASSAULT'
+			elif("THEFT" in crimes[crime][2].upper()):
+				crimes[crime][2] = 'THEFT'
+			elif("CHILDREN" in crimes[crime][2].upper()):
+				crimes[crime][2] = 'OFFENSE INVOLVING CHILDREN'
+			elif("BURGLARY" in crimes[crime][2].upper()):
+				crimes[crime][2] = 'BURGLARY'
+			elif("RAPE" in crimes[crime][2].upper()):
+				crimes[crime][2] = 'CRIM SEXUAL ASSAULT'
+			elif("WEAPONS" in crimes[crime][2].upper()):
+				crimes[crime][2] = 'WEAPONS VIOLATION'
+			
+
+			if ((lati[1] == '0.0' or latit[0] == '0.0')) or crimes[crime][2].upper() not in Category:
 				continue
 			else:
-				print lati[1]+"   "+latit[0]
-				new_writer.writerow({'ObjectID':index,'Offense':crimes[crime][2],'Day of week':weekday,'Date':datime[0],\
+				#print lati[1]+"   "+latit[0]
+				new_writer.writerow({'ObjectID':index,'Offense':crimes[crime][2].upper(),'Day of week':weekday,'Date':datime[0],\
 					'Time':datime[1][:len(datime)+2],'Latitude':lati[1],'Longitude':latit[0]}) #Write row to csv
 				index += 1
 
@@ -76,6 +92,7 @@ def cleanCH():
 
 		for crime in range(len(crimes)):
 			crimes[crime] = crimes[crime].split(',')
+			
 			
 			locationpair = crimes[crime][5]+' '+crimes[crime][6] #Latitude, Longitude pair
 			dateobj = datetime.strptime(crimes[crime][3],"%m/%d/%Y") #Date object to get Day, Month, Year
