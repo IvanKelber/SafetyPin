@@ -1,0 +1,73 @@
+rect.bordered {
+  stroke: #FFF;
+  stroke-width:2px;   
+}
+
+text.mono {
+  font-size: 9pt;
+  font-family: Consolas, courier;
+  fill: #aaa;
+}
+
+text.axis-workweek {
+  fill: #000;
+}
+
+text.axis-worktime {
+  fill: #000;
+}
+
+.trainPath {
+  stroke: #008080;
+  stroke-width: 3px;
+}
+
+.trainPath:hover {
+  stroke: #00cc7a;
+  stroke-width: 6px;
+}
+
+div.tooltip { 
+    position: absolute;     
+    text-align: center;     
+    width: 10px;          
+    height: 300px;         
+    padding: 2px;
+    font-family:arial;       
+    font: 12px sans-serif;
+    color: #fff;    
+    background: purple; 
+    border: 0px;    
+    border-radius: 5px;     
+    pointer-events: none;     
+}
+
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: purple;
+  color: #fff;
+  border-radius: 5px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: purple;
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
