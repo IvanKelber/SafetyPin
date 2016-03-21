@@ -6,7 +6,7 @@ def main():
         crimes = list(crimedata.read().splitlines())
 
     with open('../denver_crime.csv','wb') as crimedata:
-        fieldnames = ['ObjectID','Offense','Classification','Day of week','Date','Time','Latitude','Longitude']# fields of interest
+        fieldnames = ['ObjectID','Offense','Day of week','Date','Time','Latitude','Longitude']# fields of interest
         new_writer = csv.DictWriter(crimedata,fieldnames)
         new_writer.writeheader()
 
@@ -21,16 +21,19 @@ def main():
             weekday = datetime.strptime(datime[0],"%Y-%m-%d").strftime('%A') #Compute day of week
             #print weekday
             if (crimes[crime][12] != '' or crimes[crime][13] != '') and crimes[crime][5] in Category:
-                if crimes[crime][4] == 'aggravated-assault':
+                print(crimes[crime])
+
+                if crimes[crime][5] == 'aggravated-assault':
                     crime_class = 'ASSAULT'
-                elif crimes[crime][4] == 'larceny':
+                elif crimes[crime][5] == 'larceny':
                     crime_class = 'THEFT'
-                elif crimes[crime][4] == 'murder':
+                elif crimes[crime][5] == 'murder':
                     crime_class = 'HOMICIDE'
                 else:
                     crime_class = 'ROBBERY'
+
                     
-                new_writer.writerow({'ObjectID':index,'Offense':crimes[crime][5],'Classification':crime_class,'Day of week':weekday,'Date':datime[0],\
+                new_writer.writerow({'ObjectID':index,'Offense':crime_class,'Day of week':weekday,'Date':datime[0],\
 					'Time':datime[1][:len(datime)+3],'Latitude':crimes[crime][13],'Longitude':crimes[crime][12]}) #Write row to csv
                 index += 1
 
@@ -51,7 +54,7 @@ def main():
 	open('../date_table.csv','wb') as date,\
 	open('../time_table.csv','wb') as time,\
 	open('../fact_table.csv','wb') as fact:
-            offense_fields = ["Offense_ID","Offense","Classification"]
+            offense_fields = ["Offense_ID","Offense"]
             location_fields = ["Location_ID","Latitude","Longitude"]
             date_fields = ["Date_ID","Day of Week","Month","Day","Year"]
             time_fields = ["Time_ID","Hour","Minute"]
@@ -75,23 +78,23 @@ def main():
             for crime in range(len(crimes)):
                     crimes[crime] = crimes[crime].split(',')
 
-                    locationpair = crimes[crime][6]+' '+crimes[crime][7] #Latitude, Longitude pair
-                    dateobj = datetime.strptime(crimes[crime][4],"%Y-%m-%d") #Date object to get Day, Month, Year
+                    locationpair = crimes[crime][5]+' '+crimes[crime][6] #Latitude, Longitude pair
+                    dateobj = datetime.strptime(crimes[crime][3],"%Y-%m-%d") #Date object to get Day, Month, Year
                     month = dateobj.strftime('%b')
                     day = int(dateobj.strftime('%d'))
                     year = dateobj.strftime('%Y')
                     date_entry = ','.join([month,str(day),str(year)]) #Entry as required by date_table
                     #print crimes[crime]
-                    timeobj = crimes[crime][5].split(':') # Time object for hours and minutes
+                    timeobj = crimes[crime][4].split(':') # Time object for hours and minutes
                     #print timeobj
                     #break
                     hour = str(int(timeobj[0])*100)
                     minute = timeobj[1]
                     time_entry = ','.join([hour,minute]) #Entry as required by time_table
 
-                    if crimes[crime][2] not in offenses: #List of offenses
+                    if crimes[crime][1] not in offenses: #List of offenses
                             offenses[crimes[crime][1]] = offense_id
-                            offense_writer.writerow({'Offense_ID':offense_id,'Offense':crimes[crime][1],'Classification':crimes[crime][2]})
+                            offense_writer.writerow({'Offense_ID':offense_id,'Offense':crimes[crime][1]})
                             offense_id += 1
 
                     if locationpair not in locations: #List of locations
@@ -101,7 +104,7 @@ def main():
 
                     if date_entry not in dates: #List of dates
                             dates[date_entry] = date_id
-                            date_writer.writerow({'Date_ID':date_id,'Day of Week':crimes[crime][3],'Month':month,'Day':day,'Year':year})
+                            date_writer.writerow({'Date_ID':date_id,'Day of Week':crimes[crime][2],'Month':month,'Day':day,'Year':year})
                             date_id += 1
 
                     if time_entry not in times: #List of times
@@ -109,7 +112,6 @@ def main():
                             if minute == '0':
                                 minute = '0'*2
                             if hour == '0':
-                                print hour
                                 hour = '0'*3
                             time_writer.writerow({'Time_ID':time_id,'Hour':hour,'Minute':minute})
                             time_id += 1
