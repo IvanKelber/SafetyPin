@@ -21,8 +21,6 @@ def main():
             weekday = datetime.strptime(datime[0],"%Y-%m-%d").strftime('%A') #Compute day of week
             #print weekday
             if (crimes[crime][12] != '' or crimes[crime][13] != '') and crimes[crime][5] in Category:
-                print(crimes[crime])
-
                 if crimes[crime][5] == 'aggravated-assault':
                     crime_class = 'ASSAULT'
                 elif crimes[crime][5] == 'larceny':
@@ -58,7 +56,7 @@ def main():
             location_fields = ["Location_ID","Latitude","Longitude"]
             date_fields = ["Date_ID","Day of Week","Month","Day","Year"]
             time_fields = ["Time_ID","Hour","Minute"]
-            fact_fields = ["ID","Time_ID","Date_ID","Offense_ID","Location_ID"]
+            fact_fields = ["ID","City_ID","Time_ID","Date_ID","Offense_ID","Location_ID"]
 
             offense_writer = csv.DictWriter(offense,offense_fields)
             location_writer = csv.DictWriter(location,location_fields)
@@ -123,7 +121,7 @@ def main():
                     fact_locationid = locations[locationpair]
                     fact_dateid = dates[date_entry]
                     fact_timeid = times[time_entry]
-                    fact_writer.writerow({'ID':crimes[crime][0],'Time_ID':fact_timeid,'Date_ID':fact_dateid,'Offense_ID':fact_offenseid,'Location_ID':fact_locationid}) #Write into fact table
+                    fact_writer.writerow({'ID':crimes[crime][0],"City_ID":4,'Time_ID':fact_timeid,'Date_ID':fact_dateid,'Offense_ID':fact_offenseid,'Location_ID':fact_locationid}) #Write into fact table
 
 
 if __name__ == '__main__':
