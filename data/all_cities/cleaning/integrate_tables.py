@@ -6,15 +6,19 @@ import operator
 from apiclient.discovery import build
 
 
+first = 'merged4'
+second = 'bo'
+out = 'all'
+
 
 def main():
 	
 
 	#open fact tables
 
-	with open('../facts/merged2_fact_table.csv', "rb") as ny_fact, \
-	open('../facts/de_fact_table.csv', "rb") as chi_fact, \
-	open('../facts/all_fact_table.csv','a+') as ny_chi_fact:
+	with open('../facts/' + first + '_fact_table.csv', "rb") as city1_fact, \
+	open('../facts/' + second + '_fact_table.csv', "rb") as city2_fact, \
+	open('../facts/' + out + '_fact_table.csv','a+') as output_fact:
 
 		#determine which tables we update
 		#TODO this part ^^
@@ -24,8 +28,7 @@ def main():
 		offense_dict = {}
 		location_dict = {}
 
-
-
+		#old id values mapped to new id values
 		date_old_new_id = {}
 		time_old_new_id = {}
 		offense_old_new_id = {}
@@ -37,27 +40,27 @@ def main():
 		location_id = -1
 
 		###CLEANING DATE
-		with open('../date/merged2_date_table.csv', "rb") as ny_date, \
-		open('../date/de_date_table.csv', "rb") as chi_date, \
-		open('../date/all_date_table.csv', 'wb') as ny_chi_date:
+		with open('../date/' + first + '_date_table.csv', "rb") as city1_date, \
+		open('../date/' + second + '_date_table.csv', "rb") as city2_date, \
+		open('../date/' + out + '_date_table.csv', 'wb') as output_date:
 
-	  		ny_reader = csv.reader(ny_date)
+	  		city1_reader = csv.reader(city1_date)
 
-			
-			next(ny_reader,None)
+			#skip header
+			next(city1_reader,None)
 			count = 0
-			for row in ny_date:
+			for row in city1_date:
 				r = row.split(',')
 				r[-1] = r[-1].strip()
 				date_dict[str(r[1:])] = count
 				count += 1
 
-	  		chi_reader = csv.reader(chi_date)
+	  		city2_reader = csv.reader(city2_date)
 
-			ny_chi_date_writer = csv.writer(ny_chi_date)
+			output_date_writer = csv.writer(output_date)
 
-			ny_chi_date_writer.writerow(next(chi_reader,None))
-			for row in chi_date:
+			output_date_writer.writerow(next(city2_reader,None))
+			for row in city2_date:
 				r = row.split(',')
 				r[-1] = r[-1].strip()
 				try:
@@ -68,35 +71,33 @@ def main():
 					count += 1
 
 
-			for key in date_dict:
+			for key,value in sorted(date_dict.items(), key=operator.itemgetter(1)):
 				k = eval(key)
-				ny_chi_date_writer.writerow([date_dict[key]] + k)		
+				output_date_writer.writerow([value] + k)		
 
-			ny_fact_reader = csv.reader(ny_fact)
-			ny_chi_fact_writer = csv.writer(ny_chi_fact)
 
 
 
 		###CLEANING TIME
-		with open('../time/merged2_time_table.csv', "rb") as ny_time, \
-		open('../time/de_time_table.csv', "rb") as chi_time, \
-		open('../time/all_time_table.csv', 'wb') as ny_chi_time:
-	  		ny_reader = csv.reader(ny_time)
+		with open('../time/' + first + '_time_table.csv', "rb") as city1_time, \
+		open('../time/' + second + '_time_table.csv', "rb") as city2_time, \
+		open('../time/' + out + '_time_table.csv', 'wb') as output_time:
+	  		city1_reader = csv.reader(city1_time)
 
 			
-			next(ny_reader,None)
+			next(city1_reader,None)
 			count = 0
-			for row in ny_time:
+			for row in city1_time:
 				r = row.split(',')
 				r[-1] = r[-1].strip()
 				time_dict[str(r[1:])] = count
 				count += 1
 
-	  		chi_reader = csv.reader(chi_time)
-			ny_chi_time_writer = csv.writer(ny_chi_time)
+	  		city2_reader = csv.reader(city2_time)
+			output_time_writer = csv.writer(output_time)
 
-			ny_chi_time_writer.writerow(next(chi_reader,None))
-			for row in chi_time:
+			output_time_writer.writerow(next(city2_reader,None))
+			for row in city2_time:
 				r = row.split(',')
 				r[-1] = r[-1].strip()
 				try:
@@ -107,35 +108,33 @@ def main():
 					count += 1
 
 
-			for key in time_dict:
+			for key,value in sorted(time_dict.items(), key=operator.itemgetter(1)):
 				k = eval(key)
-				ny_chi_time_writer.writerow([time_dict[key]] + k)		
+				output_time_writer.writerow([value] + k)		
 
-			ny_fact_reader = csv.reader(ny_fact)
-			ny_chi_fact_writer = csv.writer(ny_chi_fact)
 
 
 
 		###CLEANING OFFENSE
-		with open('../offense/merged2_offense_table.csv', "rb") as ny_offense, \
-		open('../offense/de_offense_table.csv', "rb") as chi_offense, \
-		open('../offense/all_offense_table.csv', 'wb') as ny_chi_offense:
-	  		ny_reader = csv.reader(ny_offense)
+		with open('../offense/' + first + '_offense_table.csv', "rb") as city1_offense, \
+		open('../offense/' + second + '_offense_table.csv', "rb") as city2_offense, \
+		open('../offense/' + out + '_offense_table.csv', 'wb') as output_offense:
+	  		city1_reader = csv.reader(city1_offense)
 
 			
-			next(ny_reader,None)
+			next(city1_reader,None)
 			count = 0
-			for row in ny_offense:
+			for row in city1_offense:
 				r = row.split(',')
 				r[-1] = r[-1].strip()
 				offense_dict[str(r[1:])] = count
 				count += 1
 
-	  		chi_reader = csv.reader(chi_offense)
-			ny_chi_offense_writer = csv.writer(ny_chi_offense)
+	  		city2_reader = csv.reader(city2_offense)
+			output_offense_writer = csv.writer(output_offense)
 
-			ny_chi_offense_writer.writerow(next(chi_reader,None))
-			for row in chi_offense:
+			output_offense_writer.writerow(next(city2_reader,None))
+			for row in city2_offense:
 				r = row.split(',')
 				r[-1] = r[-1].strip()
 				try:
@@ -146,34 +145,33 @@ def main():
 					count += 1
 
 
-			for key in offense_dict:
+			for key,value in sorted(offense_dict.items(), key=operator.itemgetter(1)):
 				k = eval(key)
-				ny_chi_offense_writer.writerow([offense_dict[key]] + k)		
+				output_offense_writer.writerow([value] + k)
 
-			ny_fact_reader = csv.reader(ny_fact)
-			ny_chi_fact_writer = csv.writer(ny_chi_fact)
+
 
 
 		###CLEANING LOCATION
-		with open('../location/merged2_location_table.csv', "rb") as ny_location, \
-		open('../location/de_location_table.csv', "rb") as chi_location, \
-		open('../location/all_location_table.csv', 'wb') as ny_chi_location:
-	  		ny_reader = csv.reader(ny_location)
+		with open('../location/' + first + '_location_table.csv', "rb") as city1_location, \
+		open('../location/' + second + '_location_table.csv', "rb") as city2_location, \
+		open('../location/' + out + '_location_table.csv', 'wb') as output_location:
+	  		city1_reader = csv.reader(city1_location)
 
 			
-			next(ny_reader,None)
+			next(city1_reader,None)
 			count = 0
-			for row in ny_location:
+			for row in city1_location:
 				r = row.split(',')
 				r[-1] = r[-1].strip()
 				location_dict[str(r[1:])] = count
 				count += 1
 
-	  		chi_reader = csv.reader(chi_location)
-			ny_chi_location_writer = csv.writer(ny_chi_location)
+	  		city2_reader = csv.reader(city2_location)
+			output_location_writer = csv.writer(output_location)
 
-			ny_chi_location_writer.writerow(next(chi_reader,None))
-			for row in chi_location:
+			output_location_writer.writerow(next(city2_reader,None))
+			for row in city2_location:
 				r = row.split(',')
 				r[-1] = r[-1].strip()
 				try:
@@ -184,25 +182,25 @@ def main():
 					count += 1
 
 
-			for key in location_dict:
+			for key,value in sorted(location_dict.items(), key=operator.itemgetter(1)):
 				k = eval(key)
-				ny_chi_location_writer.writerow([location_dict[key]] + k)		
+				output_location_writer.writerow([value] + k)		
 
-			ny_fact_reader = csv.reader(ny_fact)
-			ny_chi_fact_writer = csv.writer(ny_chi_fact)
+		city1_fact_reader = csv.reader(city1_fact)
+		output_fact_writer = csv.writer(output_fact)
 
 		size = -1
-		for row in ny_fact_reader:
+		for row in city1_fact_reader:
 			size += 1
-			ny_chi_fact_writer.writerow(row)
+			output_fact_writer.writerow(row)
 
-		chi_fact_reader = csv.reader(chi_fact)
-		next(chi_fact_reader,None)
+		city2_fact_reader = csv.reader(city2_fact)
+		next(city2_fact_reader,None)
 
 
 
 		### WRITING TO FACT TABLE
-		for row in chi_fact_reader:
+		for row in city2_fact_reader:
 			date_id = row[3]
 			try:
 				date_id = date_old_new_id[row[3]]
@@ -223,25 +221,25 @@ def main():
 				location_id = location_old_new_id[row[5]]
 			except KeyError:
 				pass
-			ny_chi_fact_writer.writerow([size+1,row[1],time_id,date_id,offense_id,location_id])
+			output_fact_writer.writerow([size+1,row[1],time_id,date_id,offense_id,location_id])
 			size += 1
 
 
 
-	# with open('../date/ny_date_table.csv', 'rb') as ny, \
-	#  open('../date/chi_date_table.csv','rb') as chi, \
+	# with open('../date/city1_date_table.csv', 'rb') as city1, \
+	#  open('../date/city2_date_table.csv','rb') as city2, \
 	#  open('../date/date_table.csv',"wb") as date_output:
-	#  ny_reader = csv.reader(ny)
-	#  chi_reader = csv.reader(chi)
+	#  city1_reader = csv.reader(city1)
+	#  city2_reader = csv.reader(city2)
 	#  fieldnames = ['Date_ID','Day of Week','Month','Day','Year']
 	#  date_writer = csv.DictWriter(date_output,fieldnames)
 
-	#  next(ny_reader,None)
-	#  next(chi_reader,None)
+	#  next(city1_reader,None)
+	#  next(city2_reader,None)
 
 	#  find_writer.writeheader()
 	#   = {}
-	#  for row in ny_reader:
+	#  for row in city1_reader:
 	#  	if row not in output:
 	#  		output[row] = row.split(',')[0]	
 
