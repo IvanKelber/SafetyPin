@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+  <head>
+    <style>
+      body {
+        background-color: white;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 18px;
+        margin-top: 0px;
+        margin-left: 500px;
+        width:900px;
+        height: 865px;
+        text-align: justify;
+      }
+      .title{
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        margin-top: 10px;
+        margin-left: 100px;
+      }
+      rect.bordered {
+        stroke: #000;
+        stroke-width:4px;   
+      }
+
+      text.mono {
+        font-size: 9pt;
+        font-family: Consolas, courier;
+        fill: #000;
+      }
+
+      text.axis-workweek {
+        fill: #000;
+      }
+
+      text.axis-worktime {
+        fill: #000;
+      }
+      div.tooltip { 
+      position: absolute;     
+      color:steelblue;
+      text-align: justify;     
+      width: 500px;          
+      height: 450px;         
+      padding: 5px 5px 5px 5px;       
+      font: 15px sans-serif;    
+      background: black; 
+      opacity:0.8;
+      border: 0px;    
+      border-radius: 10px;     
+      pointer-events: none;     
+      }
+    </style>
+    <script src="http://d3js.org/d3.v3.js"></script>
+  </head>
+  <body>
+    <h1 class = "title"> MOST COMMON CRIMES PER 100 CRIMES</h1>
+    <div id="canvas-svg"></div>
+    <div id="dataset-picker">
+    </div>
+    <script type="text/javascript">
+      var margin = { top: 50, right: 0, bottom: 100, left: 30 },
+          width = 960 - margin.left - margin.right,
+          height = 480 - margin.top - margin.bottom,
+          gridSize = Math.floor(width / 15),
+          legendElementWidth = gridSize,
+          buckets = 9,
+          colors = ["#FFFFFF","#FFE5CC","#FF9999","#FF6666","#FF3333","#FF0000","#990000","#660000","#330000"], // alternatively colorbrewer.YlGnBu[9]
+          cities = ["New York", "Chicago", "Boston", "Denver", "Philadelphia"],
+          crimes = ["HO", "CSA", "RO","AS", "BU","TH", "BA", "WV","OIC", "CSO","HC"];
+          datasets = ["heat_data.csv"];
+
+      var svg = d3.select("#canvas-svg").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var cityLabels = svg.selectAll(".cityLabel")
+          .data(cities)
+          .enter().append("text")
+            .text(function (d) { return d; })
+            .attr("x", 100)
+            .attr("y", function (d, i) { return i * gridSize; })
+            .style("text-anchor", "end")
+            .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+            .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "cityLabel mono axis axis-workweek" : "cityLabel mono axis"); })
+            .style("font-size","15px");
+
+      var crimeLabels = svg.selectAll(".crimeLabel")
+          .data(crimes)
+          .enter().append("text")
+            .text(function(d) { return d; })
+            .attr("x", function(d, i) { return (i * gridSize)+70; })
+            .attr("y", 0)
+            .style("text-anchor", "middle")
+            .attr("transform", "translate(" + gridSize+ ", -6)")
+            .attr("class", "crimeLabel mono axis axis-worktime")
+            .style("font-size","15px");;
+
+      var heatmapChart = function(csvFile) {
+        d3.csv(csvFile,
+        function(d) {
+          return {
+            cityname: d.City,
+            offensename: d.Offense,
+            city: +d.Cid,
+            offense: +d.Oid,
+            count: +d.Count,
+            total: +d.Total
+          };
+        },
+        function(error, data) {
+          var colorScale = d3.scale.quantile()
+              .domain([0, buckets - 1, d3.max(data, function (d) { return Math.round(100*(d.count/d.total)); })])
+              .range(colors);
+
+          var div = d3.select("body").append("div") 
+              .attr("class", "tooltip")       
+              .style("opacity", 0);
+
+          var cards = svg.selectAll(".hour")
+              .data(data, function(d) {return d.city+':'+d.offense;});
+
+          cards.append("title");
+
+          cards.enter().append("rect")
+              .attr("x", function(d) { return 40+((d.offense + 1) * gridSize); })
+              .attr("y", function(d) { return (d.city - 1) * gridSize; })
+              .attr("rx", 4)
+              .attr("ry", 4)
+              .attr("class", "hour bordered")
+              .attr("width", gridSize)
+              .attr("height", gridSize)
+              .style("fill", colors[0])
+              .on("mouseover", function(d,i) {    
+                div.transition()    
+                .duration(200)    
+                .style("opacity", 1.0);    
+                div .html("<p style=\"text-align:center\"><b><u>Venn Diagram Showing Fraction of Total Crime</u></b></p><p>Size of the <span style=\"color:brown\">brown</span> circle shows the proportion of the selected crime for a chosen city and the <span style=\"color:white\">white</span> circle is proportional to the total number of crimes recorded in the selected city. <br><br><span style=\"color:orange\"><b>"+d.count+"</b></span> occurrences of <span style=\"color:red\"><b>"+d.offensename+"</b></span> recored in <span style=\"color:white\"><b>"+d.cityname+"</b></span>. It comprises <b>"+(100*(d.count/d.total)).toPrecision(4)+"%</b> of the total number of crimes committed in "+d.cityname+"(from the data available in our database).</p>\
+                  <?xml version=\"1.0\" standalone=\"no\"?>\
+<svg width=\"500px\" height=\"500px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\
+  <path d=\"M200 200\"/>\
+  <circle cx=\"250\" cy=\"130\" r=\"100\" fill=\"white\" stroke=\"white\"/>\
+    <circle cx=\"250\" cy=\"130\" r=\""+Math.round(100*(d.count/d.total))+"\" fill=\"brown\" stroke=\"brown\"/>\
+</svg>")  
+              .style("left", (d3.event.pageX) + "px")   
+              .style("top", (d3.event.pageY) + "px");  
+              })  
+              .on("mouseout", function(d) {   
+                div.transition()    
+                .duration(500)    
+                .style("opacity", 0); 
+              });
+
+          cards.transition().duration(1000)
+              .style("fill", function(d) { 
+                    if(d.count != 0){
+                    return colorScale( Math.round(100*(d.count/d.total)));
+                  }
+                  else{
+                    return "#aaa"
+                  }
+                  });
+
+          cards.select("title").text(function(d) { return  Math.round(100*(d.count/d.total)); });
+          
+          cards.exit().remove();
+
+          var legend = svg.selectAll(".legend")
+              .data([0].concat(colorScale.quantiles()), function(d) {return d; });
+
+          legend.enter().append("g")
+              .attr("class", "legend");
+
+          legend.append("rect")
+            .attr("x", function(d, i) { return (legendElementWidth * i)+165; })
+            .attr("y", height)
+            .attr("width", legendElementWidth)
+            .attr("height", gridSize / 2)
+            .style("fill", function(d, i) { return colors[i]; })
+            .attr("class", "hour bordered");
+
+          legend.append("text")
+            .attr("class", "mono")
+            .text(function(d) { return "> " + Math.round(d); })
+            .attr("x", function(d, i) { return (legendElementWidth * i)+165; })
+            .attr("y", height + gridSize);
+
+          legend.exit().remove();
+
+        });  
+      };
+
+      heatmapChart(datasets[0]);
+    </script>
+    <p><b><u>Brief note on our data</u></b><br><br>
+        We have restricted our data related to crime occurences on the street and that pose a potential threat to any pedestrian.  
+        Each of us cleaned crime data for a particular city. The cities we have included for our project are, New York, Chicago, Boston, Denver and Philadelphia. We collected 
+        the data from open data portals. Each of the above mentioned city had data in different formats. We cleaned and integrated it, keeping useful information, such as type 
+        of crime, timestamp of occurence and location data. We constrained ourselves to these kind of information as this will be sufficient to meet our project objective, that 
+        is, suggesting the safest possible route, given factors like time and location.
+        <br><br>
+        <b><u>Hypotheses</u></b><br><br>
+        While collecting and cleaning the data, we had the following hypotheses about our data-
+        <br>
+        a) Theft would be the most common crime across all five cities
+        <br>
+        b) Chicago would have a large fraction of its crimes related to Weapons Violation 
+        <br><br>
+        <b><u>Brief note on our visualization</u></b><br><br>
+        The above visualization provides a percentage distribution of each crime for each city. The vertical axis contains city names and the horizontal axis contains crime type.
+        The different intensities of red show the fraction of each type of crime in each city. The grey color shows that a particular type crime has not yet been recorded in our 
+        database for that particular city. We have used abbreviations for the crime types. On hovering over a particular cell, a tooltip displays the actual number of crimes in 
+        that category in that particular city and also shows a Venn Diagram which shows a graphical representation of the fraction of crimes relevant to the tooltip. The tooltip 
+        also shows the percentage of the particular crime type for the selected city.
+        <br><br>
+        <b><u>Inference from Visualization</u></b><br><br>
+        We can clearly see from the visualization that our first hypothesis about the data is true. Theft makes up for a large fraction of crime in each of the five cities. However, 
+        the hypothesis about Chicago was incorrect as only 4% of the total number of crimes in Chicago are Weapons Violation related crimes.
+
+    </p>
+  </body>
+</html>
