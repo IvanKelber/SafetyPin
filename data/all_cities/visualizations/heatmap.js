@@ -43,7 +43,7 @@ var handleData = function(dataset) {
 
 
         var colorScale = d3.scale.quantile()
-          .domain([0, buckets - 1, d3.max(dataset, function (d) { return d.count; })])
+          .domain([0, buckets - 1, d3.max(dataset, function (d) { return Math.round(100*(d.count/d.total)); })])
           .range(colors);
 
       var cards = svg.selectAll(".hour")
@@ -85,7 +85,7 @@ var handleData = function(dataset) {
       legend.append("text")
         .attr("class", "mono")
         .text(function(d) { 
-        	return "≥ " + Math.round(d); })
+        	return "≥ " + Math.round(100*(d.count/d.total)); })
         .attr("x", function(d, i) { return legendElementWidth * i; })
         .attr("y", height + gridSize);
 
