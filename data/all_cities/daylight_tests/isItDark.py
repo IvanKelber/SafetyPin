@@ -5,33 +5,33 @@ import math
 # TO DO: Account for daylight savings times
 # TO DO: Download all data for relevant cities and years
 
-def isItDark(city, month, day, year, hour, minute):
-    fname = '../' + city + '/sun_' + year + '.csv'
+# INPUT: city name (string corresponding to that city's directory in our github repo), month (int), day (int), year (int), hour (int), and minute (int)
+
+def isItDark(city, mo, d, y, h, mi):
+    fname = '../../' + city + '/sun_' + str(y) + '.csv'
     with open(fname,'rb') as sundata:
         sun = list(sundata.read().splitlines())
 
-    d = int(day)
-    m = int(month)
-
     row = sun[d-1].split(',')
 
-    sunrise = int(row[(m*2)-1])
+    sunrise = int(row[(mo*2)-1])
 
-    sunset = int(row[(m*2)])
+    sunset = int(row[(mo*2)])
 
-    t = int(hour + minute)
+    t = int(str(h) + str(mi))
 
     if t < sunrise: # Time is between midnight and sunrise
-        print 'Between midnight and sunrise'
+        #print 'Between midnight and sunrise'
         return True # It is dark
     else:
         if t < sunset: # Time is between sunrise and sunset
-            print 'Between sunrise and sunset'
+            #print 'Between sunrise and sunset'
             return False # It is not dark
         else: # Time is between sunset and midnight
-            print 'Between sunset and midnight'
-            return True # It is not dark
+            #print 'Between sunset and midnight'
+            return True # It is dark
 
+'''
 if __name__ == '__main__':
     city = sys.argv[1]
     month = sys.argv[2]
@@ -48,3 +48,4 @@ if __name__ == '__main__':
         print 'Usage: Please enter Boston, Chicago, Denver, NewYork, or Philly as city name.'
 
     isItDark(city,month,day,year,hour,minute)
+'''
