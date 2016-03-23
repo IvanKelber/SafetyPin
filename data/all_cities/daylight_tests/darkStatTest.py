@@ -74,12 +74,12 @@ def main():
     print '----- Across all cities and types of crime -----'
     print '------------------------------------------------'
     pval_total = stats.binom_test([light_total,dark_total])
-    print 'Daylight: ' + str(light_total) + ' | Darkness: ' + str(dark_total)
+    print 'Daylight: ' + str(light_total) + ' incidents | Darkness: ' + str(dark_total) + ' incidents'
     print 'P-Value: ' + str(pval_total) + '\n'
     
     # By city
     print '------------------------------------------------'
-    print '----- By city, across all types of crime -----'
+    print '------ By city, across all types of crime ------'
     print '------------------------------------------------'
     pval_by_city = {}
     for city_id,city in cities.items():
@@ -90,7 +90,7 @@ def main():
 
     # By type of crime
     print '------------------------------------------------'
-    print '----- By type of crime, across all cities -----'
+    print '----- By type of crime, across all cities ------'
     print '------------------------------------------------'
     pval_by_crime = {}
     for crime_id,crime in crimes.items():

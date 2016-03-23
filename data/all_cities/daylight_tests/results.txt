@@ -5,7 +5,7 @@ Daylight: 104098 incidents | Darkness: 394221 incidents
 P-Value: 2.47032822921e-323
 
 ------------------------------------------------
------ By city, across all types of crime -----
+------ By city, across all types of crime ------
 ------------------------------------------------
 NEW YORK
 Daylight: 22222 incidents | Darkness: 51876 incidents
@@ -28,7 +28,7 @@ Daylight: 27462 incidents | Darkness: 245781 incidents
 P-Value: 1.48219693752e-323
 
 ------------------------------------------------
------ By type of crime, across all cities -----
+----- By type of crime, across all cities ------
 ------------------------------------------------
 HOMICIDE
 Daylight: 340 incidents | Darkness: 1404 incidents
