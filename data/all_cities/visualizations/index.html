@@ -63,6 +63,7 @@
       }
     </style>
     <script src="http://d3js.org/d3.v3.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
     <h1 class = "title"> MOST COMMON CRIMES PER 100 CRIMES</h1>
@@ -194,7 +195,7 @@
 
           legend.append("text")
             .attr("class", "mono")
-            .text(function(d) { return "> " + Math.round(d); })
+            .text(function(d) { return "> " + Math.round(d) + "%"; })
             .attr("x", function(d, i) { return (legendElementWidth * i)+165; })
             .attr("y", height + gridSize);
 
