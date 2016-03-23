@@ -86,7 +86,188 @@
 
 <h3>
 <a id="cities-vs-crimes-heatmap" class="anchor" href="#cities-vs-crimes-heatmap" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Cities vs. Crimes Heatmap</h3>
+ <h1 class = "title"> MOST COMMON CRIMES PER 100 CRIMES</h1>
+    <div id="canvas-svg"></div>
+    <div id="dataset-picker">
+    </div>
+    <script type="text/javascript">
+      var margin = { top: 50, right: 0, bottom: 100, left: 30 },
+          width = 960 - margin.left - margin.right,
+          height = 480 - margin.top - margin.bottom,
+          gridSize = Math.floor(width / 15),
+          legendElementWidth = gridSize,
+          buckets = 9,
+          colors = ["#ecdf73","#bdeca0","#a4eccc","#a0e0ec","#9e9bec","#eba6ec","#ec6db3","#ec4154","#f61315"], // alternatively colorbrewer.YlGnBu[9]
+          cities = ["New York", "Chicago", "Boston", "Denver", "Philadelphia"],
+          crimes = ["HO", "CSA", "RO","AS", "BU","TH", "BA", "WV","OIC", "CSO","HC"];
+          datasets = ["heat_data.csv"];
 
+      var svg = d3.select("#canvas-svg").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var cityLabels = svg.selectAll(".cityLabel")
+          .data(cities)
+          .enter().append("text")
+            .text(function (d) { return d; })
+            .attr("x", 100)
+            .attr("y", function (d, i) { return i * gridSize; })
+            .style("text-anchor", "end")
+            .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+            .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "cityLabel mono axis axis-workweek" : "cityLabel mono axis"); })
+            .style("font-size","15px");
+
+      var crimeLabels = svg.selectAll(".crimeLabel")
+          .data(crimes)
+          .enter().append("text")
+            .text(function(d) { return d; })
+            .attr("x", function(d, i) { return (i * gridSize)+70; })
+            .attr("y", 0)
+            .style("text-anchor", "middle")
+            .attr("transform", "translate(" + gridSize+ ", -6)")
+            .attr("class", "crimeLabel mono axis axis-worktime")
+            .style("font-size","15px");;
+
+      var heatmapChart = function(csvFile) {
+        d3.csv(csvFile,
+        function(d) {
+          return {
+            cityname: d.City,
+            offensename: d.Offense,
+            city: +d.Cid,
+            offense: +d.Oid,
+            count: +d.Count,
+            total: +d.Total
+          };
+        },
+        function(error, data) {
+          var colorScale = d3.scale.quantile()
+              .domain([0, buckets - 1, d3.max(data, function (d) { return Math.round(100*(d.count/d.total)); })])
+              .range(colors);
+
+          var div = d3.select("body").append("div") 
+              .attr("class", "tooltip")       
+              .style("opacity", 0);
+
+          var cards = svg.selectAll(".hour")
+              .data(data, function(d) {return d.city+':'+d.offense;});
+
+          cards.append("title");
+
+          cards.enter().append("rect")
+              .attr("x", function(d) { return 40+((d.offense + 1) * gridSize); })
+              .attr("y", function(d) { return (d.city - 1) * gridSize; })
+              .attr("rx", 4)
+              .attr("ry", 4)
+              .attr("class", "hour bordered")
+              .attr("width", gridSize)
+              .attr("height", gridSize)
+              .style("fill", colors[0])
+              .on("mouseover", function(d,i) {    
+                div.transition()    
+                .duration(200)    
+                .style("opacity", 1.0);    
+                div .html("<p style=\"text-align:center\"><b><u>Venn Diagram Showing Fraction of Total Crime</u></b></p><p>Size of the <span style=\"color:brown\">brown</span> circle shows the proportion of the selected crime for a chosen city and the <span style=\"color:white\">white</span> circle is proportional to the total number of crimes recorded in the selected city. <br><br><span style=\"color:orange\"><b>"+d.count+"</b></span> occurrences of <span style=\"color:red\"><b>"+d.offensename+"</b></span> recored in <span style=\"color:white\"><b>"+d.cityname+"</b></span>. It comprises <b>"+(100*(d.count/d.total)).toPrecision(4)+"%</b> of the total number of crimes committed in "+d.cityname+"(from the data available in our database).</p>\
+                  <?xml version=\"1.0\" standalone=\"no\"?>\
+<svg width=\"500px\" height=\"500px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\
+  <path d=\"M200 200\"/>\
+  <circle cx=\"150\" cy=\"115\" r=\"100\" fill=\"white\" stroke=\"white\"/>\
+    <circle cx=\"150\" cy=\"115\" r=\""+Math.round(100*(d.count/d.total))+"\" fill=\"brown\" stroke=\"brown\"/>\
+</svg>")  
+              .style("left", 0 +"px")   
+              .style("top", 0  + "px");  
+              })  
+              .on("mouseout", function(d) {   
+                div.transition()    
+                .duration(500)    
+                .style("opacity", 0); 
+              });
+
+          cards.transition().duration(1000)
+              .style("fill", function(d) { 
+                    if(d.count != 0){
+                    return colorScale( Math.round(100*(d.count/d.total)));
+                  }
+                  else{
+                    return "#888"
+                  }
+                  });
+
+          cards.select("title").text(function(d) { return  Math.round(100*(d.count/d.total)); });
+          
+          cards.exit().remove();
+
+          var legend = svg.selectAll(".legend")
+              .data([0].concat(colorScale.quantiles()), function(d) {return d; });
+
+          legend.enter().append("g")
+              .attr("class", "legend");
+
+          legend.append("rect")
+            .attr("x", function(d, i) { return (legendElementWidth * i)+165; })
+            .attr("y", height)
+            .attr("width", legendElementWidth)
+            .attr("height", gridSize / 2)
+            .style("fill", function(d, i) { return colors[i]; })
+            .attr("class", "hour bordered");
+
+          legend.append("text")
+            .attr("class", "mono")
+            .text(function(d) { return "> " + Math.round(d) + "%"; })
+            .attr("x", function(d, i) { return (legendElementWidth * i)+165; })
+            .attr("y", height + gridSize);
+
+          legend.exit().remove();
+
+        });  
+      };
+
+      heatmapChart(datasets[0]);
+    </script>
+      <div class="crimelegend">
+      <table style="text-align: justify;">
+      <tr><td>HO</td><td>-</td><td>HOMICIDE</td></tr>
+      <tr><td>CSA</td><td>-</td><td>CRIM SEXUAL ASSAULT</td></tr>
+      <tr><td>RO</td><td>-</td><td>ROBBERY</td></tr>
+      <tr><td>AS</td><td>-</td><td>ASSAULT</td></tr>
+      <tr><td>BU</td><td>-</td><td>BURGLARY</td></tr>
+      <tr><td>TH</td><td>-</td><td>THEFT</td></tr>
+      <tr><td>BA</td><td>-</td><td>BATTERY</td></tr>
+      <tr><td>WV</td><td>-</td><td>WEAPONS VIOLATION</td></tr>
+      <tr><td>OIC</td><td>-</td><td>OFFEBSE INVOLVING CHILDREN</td></tr>
+      <tr><td>CSO</td><td>-</td><td>CRIM SEXUAL OFFENSE</td></tr>
+      <tr><td>HC</td><td>-</td><td>HATECRIME</td></tr>
+     </table>
+     </div>
+    <p><b><u>Brief note on our data</u></b><br><br>
+        We have restricted our data related to crime occurences on the street and that pose a potential threat to any pedestrian.  
+        Each of us cleaned crime data for a particular city. The cities we have included for our project are, New York, Chicago, Boston, Denver and Philadelphia. We collected 
+        the data from open data portals. Each of the above mentioned city had data in different formats. We cleaned and integrated it, keeping useful information, such as type 
+        of crime, timestamp of occurence and location data. We constrained ourselves to these kind of information as this will be sufficient to meet our project objective, that 
+        is, suggesting the safest possible route, given factors like time and location.
+        <br><br>
+        <b><u>Hypotheses</u></b><br><br>
+        While collecting and cleaning the data, we had the following hypotheses about our data-
+        <br>
+        a) Theft would be the most common crime across all five cities
+        <br>
+        b) Chicago would have a large fraction of its crimes related to Weapons Violation 
+        <br><br>
+        <b><u>Brief note on our visualization</u></b><br><br>
+        The above visualization provides a percentage distribution of each crime for each city. The vertical axis contains city names and the horizontal axis contains crime type.
+        The different intensities of red show the fraction of each type of crime in each city. The grey color shows that a particular type crime has not yet been recorded in our 
+        database for that particular city. We have used abbreviations for the crime types. On hovering over a particular cell, a tooltip displays the actual number of crimes in 
+        that category in that particular city and also shows a Venn Diagram which shows a graphical representation of the fraction of crimes relevant to the tooltip. The tooltip 
+        also shows the percentage of the particular crime type for the selected city.
+        <br><br>
+        <b><u>Inference from Visualization</u></b><br><br>
+        We can clearly see from the visualization that our first hypothesis about the data is true. Theft makes up for a large fraction of crime in each of the five cities. However, 
+        the hypothesis about Chicago was incorrect as only 4% of the total number of crimes in Chicago are Weapons Violation related crimes.<br><br>
+        Also, we can see from our visualization that all cities have actively been maintaining records related to Robbery, Assault, Burglary and Theft. This is expected because these are 
+        the most common types of crimes that occur.  
+    </p>
 <h3>
 <a id="sundown-statistical-analysis" class="anchor" href="#sundown-statistical-analysis" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sundown Statistical Analysis</h3>
 
