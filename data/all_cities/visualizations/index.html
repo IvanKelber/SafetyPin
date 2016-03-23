@@ -4,7 +4,7 @@
   <head>
     <style>
       body {
-        background-color: white;
+        background-color: black;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         font-size: 18px;
         margin-top: 0px;
@@ -12,10 +12,11 @@
         width:900px;
         height: 865px;
         text-align: justify;
+        color:white;
       }
       .crimelegend{
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: black;
+        color: white;
         margin-top: 10px;
         margin-left: 370px;
       }
@@ -23,6 +24,7 @@
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         margin-top: 10px;
         margin-left: 100px;
+        color: white;
       }
       rect.bordered {
         stroke: #000;
@@ -32,29 +34,32 @@
       text.mono {
         font-size: 9pt;
         font-family: Consolas, courier;
-        fill: #000;
+        fill: #fff;
       }
 
       text.axis-workweek {
-        fill: #000;
+        fill: #fff;
       }
 
       text.axis-worktime {
-        fill: #000;
+        fill: #fff;
       }
       div.tooltip { 
       position: absolute;     
       color:steelblue;
       text-align: justify;     
-      width: 500px;          
-      height: 450px;         
+      width: 300px;          
+      height: 475px;         
       padding: 5px 5px 5px 5px;       
       font: 15px sans-serif;    
       background: black; 
       opacity:0.8;
       border: 0px;    
       border-radius: 10px;     
-      pointer-events: none;     
+      pointer-events: none; 
+      margin-top: 50px;
+      margin-left: 100px;
+      float:left;
       }
     </style>
     <script src="http://d3js.org/d3.v3.js"></script>
@@ -71,7 +76,7 @@
           gridSize = Math.floor(width / 15),
           legendElementWidth = gridSize,
           buckets = 9,
-          colors = ["#FFFFFF","#FFE5CC","#FF9999","#FF6666","#FF3333","#FF0000","#990000","#660000","#330000"], // alternatively colorbrewer.YlGnBu[9]
+          colors = ["#ecdf73","#bdeca0","#a4eccc","#a0e0ec","#9e9bec","#eba6ec","#ec6db3","#ec4154","#f61315"], // alternatively colorbrewer.YlGnBu[9]
           cities = ["New York", "Chicago", "Boston", "Denver", "Philadelphia"],
           crimes = ["HO", "CSA", "RO","AS", "BU","TH", "BA", "WV","OIC", "CSO","HC"];
           datasets = ["heat_data.csv"];
@@ -147,11 +152,11 @@
                   <?xml version=\"1.0\" standalone=\"no\"?>\
 <svg width=\"500px\" height=\"500px\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\
   <path d=\"M200 200\"/>\
-  <circle cx=\"250\" cy=\"130\" r=\"100\" fill=\"white\" stroke=\"white\"/>\
-    <circle cx=\"250\" cy=\"130\" r=\""+Math.round(100*(d.count/d.total))+"\" fill=\"brown\" stroke=\"brown\"/>\
+  <circle cx=\"150\" cy=\"115\" r=\"100\" fill=\"white\" stroke=\"white\"/>\
+    <circle cx=\"150\" cy=\"115\" r=\""+Math.round(100*(d.count/d.total))+"\" fill=\"brown\" stroke=\"brown\"/>\
 </svg>")  
-              .style("left", (d3.event.pageX) + "px")   
-              .style("top", (d3.event.pageY) + "px");  
+              .style("left", 0 +"px")   
+              .style("top", 0	 + "px");  
               })  
               .on("mouseout", function(d) {   
                 div.transition()    
@@ -165,7 +170,7 @@
                     return colorScale( Math.round(100*(d.count/d.total)));
                   }
                   else{
-                    return "#aaa"
+                    return "#888"
                   }
                   });
 
@@ -238,8 +243,9 @@
         <br><br>
         <b><u>Inference from Visualization</u></b><br><br>
         We can clearly see from the visualization that our first hypothesis about the data is true. Theft makes up for a large fraction of crime in each of the five cities. However, 
-        the hypothesis about Chicago was incorrect as only 4% of the total number of crimes in Chicago are Weapons Violation related crimes.
-
+        the hypothesis about Chicago was incorrect as only 4% of the total number of crimes in Chicago are Weapons Violation related crimes.<br><br>
+        Also, we can see from our visualization that all cities have actively been maintaining records related to Robbery, Assault, Burglary and Theft. This is expected because these are 
+        the most common types of crimes that occur.  
     </p>
 
   </body>
