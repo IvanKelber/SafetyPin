@@ -20,8 +20,8 @@ def isItDark(city, mo, d, y, h, mi):
     DSTend = {2011:6, 2012:4, 2013:3, 2014:2, 2015:1, 2016:6} # always end in November
 
     if (mo==3 and d>=DSTstart[y]) or (mo==11 and d<DSTend[y]) or (mo>3 and mo<11): # Daylight Savings Time is in effect
-        sunrise += 1
-        sunset += 1
+        sunrise += 100
+        sunset += 100
 
     t = int(str(h) + str(mi))
 

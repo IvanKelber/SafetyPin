@@ -1,0 +1,75 @@
+------------------------------------------------
+----- Across all cities and types of crime -----
+------------------------------------------------
+Daylight: 104098 incidents | Darkness: 394221 incidents
+P-Value: 2.47032822921e-323
+
+------------------------------------------------
+----- By city, across all types of crime -----
+------------------------------------------------
+NEW YORK
+Daylight: 22222 incidents | Darkness: 51876 incidents
+P-Value: 9.88131291682e-324
+
+CHICAGO
+Daylight: 7784 incidents | Darkness: 16551 incidents
+P-Value: 4.94065645841e-324
+
+BOSTON
+Daylight: 24149 incidents | Darkness: 48075 incidents
+P-Value: 9.88131291682e-324
+
+DENVER
+Daylight: 22481 incidents | Darkness: 31938 incidents
+P-Value: 9.88131291682e-324
+
+PHILLY
+Daylight: 27462 incidents | Darkness: 245781 incidents
+P-Value: 1.48219693752e-323
+
+------------------------------------------------
+----- By type of crime, across all cities -----
+------------------------------------------------
+HOMICIDE
+Daylight: 340 incidents | Darkness: 1404 incidents
+P-Value: 2.8697439064e-153
+
+CRIMINAL SEXUAL ASSAULT
+Daylight: 421 incidents | Darkness: 3828 incidents
+P-Value: 0.0
+
+ROBBERY
+Daylight: 9189 incidents | Darkness: 38222 incidents
+P-Value: 4.94065645841e-324
+
+ASSAULT
+Daylight: 23879 incidents | Darkness: 119539 incidents
+P-Value: 9.88131291682e-324
+
+BURGLARY
+Daylight: 7672 incidents | Darkness: 35680 incidents
+P-Value: 4.94065645841e-324
+
+THEFT
+Daylight: 58986 incidents | Darkness: 184095 incidents
+P-Value: 1.48219693752e-323
+
+BATTERY
+Daylight: 1627 incidents | Darkness: 2554 incidents
+P-Value: 6.88691451774e-47
+
+WEAPONS VIOLATION
+Daylight: 1575 incidents | Darkness: 4992 incidents
+P-Value: 4.94065645841e-324
+
+OFFENSE INVOLVING CHILDREN
+Daylight: 69 incidents | Darkness: 454 incidents
+P-Value: 1.72842011796e-70
+
+CRIMINAL SEXUAL OFFENSE
+Daylight: 327 incidents | Darkness: 3431 incidents
+P-Value: 0.0
+
+HATE CRIME
+Daylight: 13 incidents | Darkness: 22 incidents
+P-Value: 0.175465248991

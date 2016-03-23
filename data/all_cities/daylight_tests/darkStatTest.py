@@ -75,7 +75,7 @@ def main():
     print '------------------------------------------------'
     pval_total = stats.binom_test([light_total,dark_total])
     print 'Daylight: ' + str(light_total) + ' | Darkness: ' + str(dark_total)
-    print 'P-Value: ' + str(pval_total)
+    print 'P-Value: ' + str(pval_total) + '\n'
     
     # By city
     print '------------------------------------------------'
@@ -85,8 +85,8 @@ def main():
     for city_id,city in cities.items():
         pval_by_city[city] = stats.binom_test([light_by_city[city],dark_by_city[city]])
         print city.upper()
-        print 'Daylight: ' + str(light_by_city[city]) + ' | Darkness: ' + str(dark_by_city[city])
-        print 'P-Value: ' + str(pval_by_city[city])
+        print 'Daylight: ' + str(light_by_city[city]) + ' incidents | Darkness: ' + str(dark_by_city[city]) + ' incidents'
+        print 'P-Value: ' + str(pval_by_city[city]) + '\n'
 
     # By type of crime
     print '------------------------------------------------'
@@ -96,8 +96,8 @@ def main():
     for crime_id,crime in crimes.items():
         pval_by_crime[crime] = stats.binom_test([light_by_crime[crime],dark_by_crime[crime]])
         print crime
-        print 'Daylight: ' + str(light_by_crime[crime]) + ' | Darkness: ' + str(dark_by_crime[crime])
-        print 'P-Value: ' + str(pval_by_crime[crime])
+        print 'Daylight: ' + str(light_by_crime[crime]) + ' incidents | Darkness: ' + str(dark_by_crime[crime]) + ' incidents'
+        print 'P-Value: ' + str(pval_by_crime[crime]) + '\n'
     
 if __name__ == '__main__':
     main()
