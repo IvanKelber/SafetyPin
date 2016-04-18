@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import scipy
-from Graphs import *
+from graphs import *
 import operator
 from scipy import spatial
 
