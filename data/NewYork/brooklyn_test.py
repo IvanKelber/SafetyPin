@@ -4,8 +4,11 @@ import scipy
 from graphs import *
 import operator
 from scipy import spatial
-
+import math
 from datetime import datetime
+import numpy
+import sqlite3
+
 try:
     from xml.etree import cElementTree as ET
 except ImportError, e:
@@ -78,7 +81,7 @@ def extract_intersections(osm, verbose=True):
                 inIntersections = counter[child.attrib['id']]
                 coordinate = child.attrib['lat'] + ',' + child.attrib['lon']
                 intersection_coordinates[child.attrib['id']]=coordinate
-                #print(coordinate)
+                print(coordinate)
             except:
                 continue
 
@@ -149,8 +152,84 @@ def findOrder(bag,coordinates):
     return finalOrder
 
 
-def main():
-    extract_intersections('./OSM_data/test_streets4.osm')
+def getCrimeArea(coord1, coord2):
+	tradeOffVer = 0.00003
+	tradeOffHor = 0.003
 
+	slope = calcLineSlope(coord1[0],coord1[1],coord2[0],coord2[1])
+	center = getMidpoint(coord1,coord2)
+
+	if slope != 0:
+		if slope != "infinite":
+		 	slopeP = -1/float(slope)
+		else:
+			slopeP = 0
+
+	 	intercept = calcLineIntercept(slopeP,center[0],center[1])
+	 	a = 1 + slopeP**2
+	 	b = 2 * (slopeP*(intercept - center[1]) - center[0])
+	 	c = center[0]**2 + intercept**2 + center[1]**2 - (2*intercept*center[1]) - tradeOffVer
+	 	xcoords = numpy.roots([a,b,c])
+
+	 	verCoords = [(xcoords[0],xcoords[0]*slopeP+intercept),(xcoords[1],xcoords[1]*slopeP+intercept)]
+	else:
+		verCoords = [(center[0],center[1] + tradeOffVer),(center[0],center[1] - tradeOffVer)]
+
+	
+	distance = scipy.spatial.distance.euclidean(center,coord1) - tradeOffHor
+
+ 	intercept = calcLineIntercept(slope,center[0],center[1])
+ 	a = 1 + slope**2
+ 	b = 2 * (slope*(intercept - center[1]) - center[0])
+ 	c = center[0]**2 + intercept**2 + center[1]**2 - (2*intercept*center[1]) - distance**2
+ 	xcoords = numpy.roots([a,b,c])
+
+ 	horCoords = [(xcoords[0],xcoords[0]*slope+intercept),(xcoords[1],xcoords[1]*slope+intercept)]
+
+ 	crimeLocs = getCrimes(verCoords,(coord1,coord2))
+ 	# for loc in crimeLocs:
+		# print str(loc[1])+","+str(loc[2])
+	for loc in crimeLocs:
+		if drawElipse(center,horCoords[0],verCoords[0],(loc[1],loc[2])):
+			crimeLocs.remove(loc)
+
+	for loc in crimeLocs:
+		print str(loc[1])+","+str(loc[2])
+ 	return crimeLocs
+
+
+def getCrimes(ver,hor):
+		conn = sqlite3.connect('../all_cities/crime.db')
+		c = conn.cursor()
+		c.execute("SELECT T.LID,T.LATITUDE,T.LONGITUDE,T.OFFENSE_ID FROM OFFENSE O,(SELECT L.ID LID,LATITUDE,LONGITUDE,OFFENSE_ID FROM LOCATION L,FACT F WHERE (LATITUDE BETWEEN "\
+			+str(hor[1][0])+" AND "+str(hor[0][0])+" ) AND (LONGITUDE BETWEEN "+str(ver[0][1])+" AND "+str(ver[1][1])+" AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
+		crimeLocs = []
+		for row in c:		
+			crimeLocs.append(row)
+		conn.close()
+
+		return crimeLocs
+
+def drawElipse(center,a,b,loc):
+	smallAxis = scipy.spatial.distance.euclidean(center,b)
+	bigAxis = scipy.spatial.distance.euclidean(center,a)
+	acceptCrime = (((loc[0]-center[0])**2)/((bigAxis)**2) + ((loc[1]-center[1])**2)/((smallAxis)**2)) <= 1
+	return acceptCrime
+
+def calcLineSlope(x1, y1, x2, y2):
+	if x1 == x2:
+		return "infinite"
+	return (y1 - y2)/float(x1 - x2)
+
+def calcLineIntercept(m,x,y):
+	if m != "infinite":
+			return y - m*x
+	return 0
+def getMidpoint(A, B):
+	return ((A[0]+B[0])/float(2),(A[1]+B[1])/float(2))
+
+def main():
+    #extract_intersections('../../../../map1.osm')
+    getCrimeArea((40.6521768650001,-73.94972028),(40.6030714710001,-73.961050676))
 
 main()
