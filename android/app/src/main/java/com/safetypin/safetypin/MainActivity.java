@@ -2,11 +2,12 @@ package com.safetypin.safetypin;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -16,14 +17,20 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final TextView tv = (TextView) findViewById(R.id.text_view);
+        final EditText addr = (EditText) findViewById(R.id.addr_text);
+        final TextView response = (TextView) findViewById(R.id.text_view);
 
-        tv.setOnClickListener(new View.OnClickListener() {
+        addr.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onClick(View view) {
-                MyClientTask mct = new MyClientTask("192.168.0.5",12346,tv,"I come in peace");
-                mct.execute();
-                Toast.makeText(getApplicationContext(),"yolo",Toast.LENGTH_SHORT).show();
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    String[] addressInfo = addr.getText().toString().split(":");
+                    MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),response,"I come in peace.");
+                    mct.execute();
+                    handled = true;
+                }
+                return handled;
             }
         });
     }
