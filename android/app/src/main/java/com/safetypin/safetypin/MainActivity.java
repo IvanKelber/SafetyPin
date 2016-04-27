@@ -1,11 +1,14 @@
 package com.safetypin.safetypin;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -19,6 +22,7 @@ public class MainActivity extends ActionBarActivity {
 
         final EditText addr = (EditText) findViewById(R.id.addr_text);
         final TextView response = (TextView) findViewById(R.id.text_view);
+        final Button button = (Button) findViewById(R.id.toMaps);
 
         addr.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -31,6 +35,14 @@ public class MainActivity extends ActionBarActivity {
                     handled = true;
                 }
                 return handled;
+            }
+        });
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this,MapsActivity.class);
+                startActivity(i);
             }
         });
     }
