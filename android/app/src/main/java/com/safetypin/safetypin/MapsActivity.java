@@ -28,11 +28,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
         LocationListener locationListener = new LocationListener() {
 
             @Override
             public void onLocationChanged(Location location) {
-                Toast.makeText(getApplicationContext(),"" + location.getLatitude() + ", " +location.getLongitude(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "" + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+                LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current,15.0f));
             }
 
             @Override
@@ -51,17 +62,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
 
         // Add a marker in Sydney, Australia, and move the camera.
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        LatLng ny = new LatLng(40.7128, -74.0059);
-        mMap.addMarker(new MarkerOptions().position(ny).title("Marker in NYC"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        LatLng ny = new LatLng(40.7128, -74.0059);
+//        mMap.addMarker(new MarkerOptions().position(ny).title("Marker in NYC"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
     }
 }
