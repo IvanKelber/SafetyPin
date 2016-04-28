@@ -36,10 +36,7 @@
             android:parentActivityName=".MainActivity" >
 
         </activity>
-        <activity
-            android:name=".TempActivity"
-            android:label="@string/title_activity_temp" >
-        </activity>
+
     </application>
 
 </manifest>
