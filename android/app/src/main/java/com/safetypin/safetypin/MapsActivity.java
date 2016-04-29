@@ -23,11 +23,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, PlaceSelectionListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, PlaceSelectionListener, GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
-    private MarkerCache<Marker> currentMarkers = new MarkerCache<Marker>(2);
+    private MarkerCache<Marker> userLocation = new MarkerCache<Marker>(1);
+    private MarkerCache<Marker> userDestination= new MarkerCache<Marker>(1);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(this);
 
         LocationListener locationListener = new LocationListener() {
         final ArrayList<Marker> previous = new ArrayList<>();
@@ -54,10 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng newLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
                 Marker m = mMap.addMarker(new MarkerOptions().position(newLocation).title("Current Location"));
-                currentMarkers.add(m);
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation,15.0f));
-
-
+                userLocation.add(m);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 15.0f));
             }
 
             @Override
@@ -89,8 +90,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onPlaceSelected(Place place) {
         LatLng destination = place.getLatLng();
-        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination"));
-        currentMarkers.add(m);
+        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
+        userDestination.add(m);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination,13.5f));
     }
 
@@ -101,5 +102,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(this, "Place selection failed: " + status.getStatusMessage(),
                 Toast.LENGTH_SHORT).show();
 
+    }
+
+    @Override
+    public void onMapClick(LatLng destination) {
+        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
+        userDestination.add(m);
     }
 }
