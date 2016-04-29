@@ -110,7 +110,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (userLocation.size() == 1) {
 //            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
             updateCamera(m,userLocation.getFirst());
-
+            DirectionsFetcher df = new DirectionsFetcher(mMap,userLocation.getFirst().getPosition(),destination,tv);
+            df.execute();
         } else {
             CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
         }
