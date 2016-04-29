@@ -1,6 +1,8 @@
 package com.safetypin.safetypin;
 
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -16,14 +18,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, PlaceSelectionListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
-    private boolean currentFound = false;
-
+    private MarkerCache<Marker> currentMarkers = new MarkerCache<Marker>(2);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,46 +40,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         autoCompleteFragment.setOnPlaceSelectedListener(this);
         mapFragment.getMapAsync(this);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-//        LocationListener locationListener = new LocationListener() {
-//
-//            @Override
-//            public void onLocationChanged(Location location) {
-////                Toast.makeText(getApplicationContext(), "" + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-//                LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-//                mMap.clear();
-//                mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
-//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current,15.0f));
-//                if (!currentFound) {
-//                    currentFound = true;
-//                }
-//            }
-//
-//            @Override
-//            public void onStatusChanged(String s, int i, Bundle bundle) {
-//
-//            }
-//
-//            @Override
-//            public void onProviderEnabled(String s) {
-//
-//            }
-//
-//            @Override
-//            public void onProviderDisabled(String s) {
-//
-//            }
-//        };
-//
-//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 5, locationListener);
+        LocationListener locationListener = new LocationListener() {
+        final ArrayList<Marker> previous = new ArrayList<>();
+            @Override
+            public void onLocationChanged(Location location) {
+//                Toast.makeText(getApplicationContext(), "" + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+                LatLng newLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-        // Add a marker in Sydney, Australia, and move the camera.
+                Marker m = mMap.addMarker(new MarkerOptions().position(newLocation).title("Current Location"));
+                currentMarkers.add(m);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation,15.0f));
+
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 5, locationListener);
+
+////        Add a marker in Sydney, Australia, and move the camera.
 //        LatLng sydney = new LatLng(-34, 151);
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        LatLng ny = new LatLng(40.7128, -74.0059);
@@ -86,7 +89,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onPlaceSelected(Place place) {
         LatLng destination = place.getLatLng();
-        mMap.addMarker(new MarkerOptions().position(destination).title("Destination"));
+        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination"));
+        currentMarkers.add(m);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination,13.5f));
     }
 
