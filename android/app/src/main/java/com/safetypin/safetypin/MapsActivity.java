@@ -6,6 +6,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,11 +14,13 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -58,7 +61,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 Marker m = mMap.addMarker(new MarkerOptions().position(newLocation).title("Current Location"));
                 userLocation.add(m);
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 15.0f));
+                if(userDestination.size() == 1) {
+//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(m.getPosition(), userDestination.getFirst().getPosition()), 13.5f));
+                    updateCamera(m,userDestination.getFirst());
+                } else {
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 14.5f));
+                }
             }
 
             @Override
@@ -77,7 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
 
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 5, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
 ////        Add a marker in Sydney, Australia, and move the camera.
 //        LatLng sydney = new LatLng(-34, 151);
@@ -87,12 +95,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
     }
 
+    public LatLng getMiddle(LatLng l1, LatLng l2) {
+
+        double lat = (l2.latitude + l1.latitude)/2;
+        double lng = (l2.longitude + l1.longitude)/2;
+//        double dLon = Math.toRadians(l1.longitude - l2.longitude);
+//        //convert to radians
+//        double lat1 = Math.toRadians(l1.latitude);
+//        double lat2 = Math.toRadians(l2.latitude);
+//        double lon1 = Math.toRadians(l1.longitude);
+//
+//        double Bx = Math.cos(lat2) * Math.cos(dLon);
+//        double By = Math.cos(lat2) * Math.sin(dLon);
+//        double lat3 = Math.toDegrees(Math.atan2(Math.sin(lat1) + Math.sin(lat2), Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By)));
+//        double lon3 = Math.toDegrees(lon1 + Math.atan2(By, Math.cos(lat1) + Bx));
+
+        return new LatLng(lat,lng);
+    }
+
+    public void updateCamera(Marker source, Marker destination) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        builder.include(source.getPosition());
+        builder.include(destination.getPosition());
+
+        DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
+        int width = displayMetrics.widthPixels;
+        int padding = (width *10)/30; // offset from edges of the map
+        // in pixels
+
+        LatLngBounds bounds = builder.build();
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds,padding);
+
+        mMap.animateCamera(cu);
+    }
+
     @Override
     public void onPlaceSelected(Place place) {
         LatLng destination = place.getLatLng();
         Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
         userDestination.add(m);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination,13.5f));
+        if (userLocation.size() == 1) {
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
+            updateCamera(m,userLocation.getFirst());
+
+        } else {
+            CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
+        }
     }
 
     @Override
@@ -108,5 +157,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapClick(LatLng destination) {
         Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
         userDestination.add(m);
+        if (userLocation.size() == 1) {
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
+            updateCamera(m,userLocation.getFirst());
+        } else {
+            CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
+        }
     }
 }
