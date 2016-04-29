@@ -67,6 +67,7 @@ public class DirectionsFetcher extends AsyncTask<Void, Integer, String> {
 //        addMarkersToMap(latLngs);
 //        tv.setText(result);
         Log.v("JSON RESULT:::",result);
+        //draw the poly path
         drawPath(result);
     }
 
