@@ -50,6 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(this);
 
         LocationListener locationListener = new LocationListener() {
@@ -59,11 +60,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                Toast.makeText(getApplicationContext(), "" + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
                 LatLng newLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-                Marker m = mMap.addMarker(new MarkerOptions().position(newLocation).title("Current Location"));
+                Marker m = mMap.addMarker(new MarkerOptions().position(newLocation).title("Current Location").visible(false));
                 userLocation.add(m);
                 if(userDestination.size() == 1) {
 //                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(m.getPosition(), userDestination.getFirst().getPosition()), 13.5f));
-                    updateCamera(m,userDestination.getFirst());
+//                    updateCamera(m,userDestination.getFirst());
                 } else {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 14.5f));
                 }
