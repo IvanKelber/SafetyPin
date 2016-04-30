@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
@@ -32,11 +34,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locationManager;
     private MarkerCache<Marker> userLocation = new MarkerCache<Marker>(1);
     private MarkerCache<Marker> userDestination= new MarkerCache<Marker>(1);
+    private TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        tv = (TextView) findViewById(R.id.json_view);
+        tv.setVisibility(View.GONE);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         PlaceAutocompleteFragment autoCompleteFragment = (PlaceAutocompleteFragment)
@@ -96,6 +101,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(ny));
     }
 
+
+    @Override
+    public void onPlaceSelected(Place place) {
+        LatLng destination = place.getLatLng();
+        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
+        userDestination.add(m);
+        if (userLocation.size() == 1) {
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
+            updateCamera(m,userLocation.getFirst());
+            DirectionsFetcher df = new DirectionsFetcher(mMap,userLocation.getFirst().getPosition(),destination,tv);
+            df.execute();
+        } else {
+            CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
+        }
+    }
+
+    @Override
+    public void onError(Status status) {
+        Log.e("Autocompletefragment failed", "onError: Status = " + status.toString());
+
+        Toast.makeText(this, "Place selection failed: " + status.getStatusMessage(),
+                Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onMapClick(LatLng destination) {
+        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
+        userDestination.add(m);
+        if (userLocation.size() == 1) {
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
+            updateCamera(m,userLocation.getFirst());
+            DirectionsFetcher df = new DirectionsFetcher(mMap,userLocation.getFirst().getPosition(),destination,tv);
+            df.execute();
+//            tv.setVisibility(View.VISIBLE);
+        } else {
+            CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
+        }
+    }
+
     public LatLng getMiddle(LatLng l1, LatLng l2) {
 
         double lat = (l2.latitude + l1.latitude)/2;
@@ -131,38 +176,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(cu);
     }
 
-    @Override
-    public void onPlaceSelected(Place place) {
-        LatLng destination = place.getLatLng();
-        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
-        userDestination.add(m);
-        if (userLocation.size() == 1) {
-//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
-            updateCamera(m,userLocation.getFirst());
-
-        } else {
-            CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
-        }
-    }
-
-    @Override
-    public void onError(Status status) {
-        Log.e("Autocompletefragment failed", "onError: Status = " + status.toString());
-
-        Toast.makeText(this, "Place selection failed: " + status.getStatusMessage(),
-                Toast.LENGTH_SHORT).show();
-
-    }
-
-    @Override
-    public void onMapClick(LatLng destination) {
-        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
-        userDestination.add(m);
-        if (userLocation.size() == 1) {
-//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
-            updateCamera(m,userLocation.getFirst());
-        } else {
-            CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
-        }
-    }
 }
