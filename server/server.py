@@ -240,25 +240,25 @@ def getCrimes(area):
 
     return crimeLocs
 
-def linePoint(bounds,loc):
-	slope = calcLineSlope(bounds[0][0],bounds[0][1],bounds[1][0],bounds[1][1])
-	return (slope - (loc[1]-bounds[1][1])/(loc[0]-bounds[1][0]))
+# def linePoint(bounds,loc):
+# 	slope = calcLineSlope(bounds[0][0],bounds[0][1],bounds[1][0],bounds[1][1])
+# 	return (slope - (loc[1]-bounds[1][1])/(loc[0]-bounds[1][0]))
 
-def drawParallelogram(area,loc):
-	# line one h[0]-v[0]
-	if linePoint([area[0][0],area[1][0]],loc) < 0:
-		return False
-	# line two h[0]-v[1]
-	elif linePoint([area[0][0],area[1][1]],loc) > 0:
-		return False
-	# line three v[0]-h[1]
-	elif linePoint([area[1][0],area[0][1]],loc) < 0:
-		return False
-	# line four v[1]-h[1]
-	elif linePoint([area[1][1],area[0][1]],loc) < 0:
-		return False
-	else:
-		return True
+# def drawParallelogram(area,loc):
+# 	# line one h[0]-v[0]
+# 	if linePoint([area[0][0],area[1][0]],loc) < 0:
+# 		return False
+# 	# line two h[0]-v[1]
+# 	elif linePoint([area[0][0],area[1][1]],loc) > 0:
+# 		return False
+# 	# line three v[0]-h[1]
+# 	elif linePoint([area[1][0],area[0][1]],loc) < 0:
+# 		return False
+# 	# line four v[1]-h[1]
+# 	elif linePoint([area[1][1],area[0][1]],loc) < 0:
+# 		return False
+# 	else:
+# 		return True
 
 
 
@@ -280,8 +280,43 @@ def calcLineIntercept(m,x,y):
 def getMidpoint(A, B):
     return ((A[0]+B[0])/float(2),(A[1]+B[1])/float(2))
 
+def dijkstras(mapGraph,start,end):
+    distance = {}
+
+    for node in mapGraph.nodes:
+        if node.reference != start.reference:
+            distance[node.reference] = float("inf")
+            continue
+        distance[node.reference] = 0
+
+    visitedNodes = set()
+    nodeQueue = mapGraph.nodes
+
+    while len(nodeQueue)  > 0:
+        closestNode = shortestPath(nodeQueue,distance)
+        visitedNodes = visitedNodes.union(closestNode) 
+
+        for edge in mapGraph.edge:
+            if edge.node1.reference == closestNode.reference:
+            	if distance[node2] > distance[node1] + edge.crimeWeight
+            		distance[node2] = distance[node1] + edge.crimeWeight
+            elif edge.node2.reference == closestNode.reference:
+            	if distance[node1] > distance[node2] + edge.crimeWeight
+            		distance[node1] = distance[node2] + edge.crimeWeight
+
+                
+
+
+
+
+
 def main():
     #extract_intersections('../../../../map1.osm')
-    getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028))
+    # getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028))
+    nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5)),Node(6,(6,6))]
+    edges = [Edge(Node(1,(1,1)),Node(2,(2,2))),Edge(Node(2,(2,2)),Node(3,(3,3))),Edge(Node(3,(3,3)),Node(6,(6,6))),Edge(Node(1,(1,1)),Node(5,(5,5))),Edge(Node(5,(5,5)),Node(6,(6,6)))]
+    graph = Graph(nodes,edges)
+    dijkstras(graph)
 
-main()
+if __name__=="main":
+	main()

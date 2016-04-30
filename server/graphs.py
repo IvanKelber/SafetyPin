@@ -11,12 +11,15 @@ class Node:
 
 class Edge:
 	
+	reference = ""
 	node1 = None
 	node2 = None
+	crimeWeight = 0
 
 	def __init__(self,node1,node2):
 		self.node1 = node1
 		self.node2 = node2
+		self.reference = node1.reference + node2.reference
 
 
 class Graph:
