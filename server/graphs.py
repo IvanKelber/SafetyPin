@@ -1,4 +1,4 @@
-
+import scipy
 
 class Node:
 
@@ -11,15 +11,15 @@ class Node:
 
 class Edge:
 	
-	reference = ""
+	# reference = ""
 	node1 = None
 	node2 = None
 	crimeWeight = 0
 
-	def __init__(self,reference,node1,node2,crimeWeight):
+	def __init__(self,node1,node2,crimeWeight):
 		self.node1 = node1
 		self.node2 = node2
-		self.reference = reference
+		# self.reference = reference
 		self.crimeWeight = crimeWeight
 
 
