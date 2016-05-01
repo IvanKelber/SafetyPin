@@ -142,6 +142,10 @@ def findOrder(bag,coordinates):
         endCoordinate = eval(coordinates[endPoints[0]])
     except KeyError:
         endCoordinate = eval(coordinates[endPoints[1]])
+    except IndexError:
+        # print bag,endPoints 
+        (i,) = bag
+        return [i]
     orderedDict = {}
     finalOrder = []
     for intersection in bag:
