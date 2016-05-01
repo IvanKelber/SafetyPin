@@ -152,13 +152,16 @@ def findOrder(bag,coordinates):
     return finalOrder
 
 
+
+
+# returns four lat-long pairs between two input 
 def getCrimeArea(coord1, coord2):
     tradeOffVer = 0.00003
     tradeOffHor = 0.003
 
     slope = calcLineSlope(coord1[0],coord1[1],coord2[0],coord2[1])
     center = getMidpoint(coord1,coord2)
-    print center,"CENTER"
+    # print center,"CENTER"
 
     if slope != 0:
         if slope != "infinite":
@@ -176,7 +179,7 @@ def getCrimeArea(coord1, coord2):
     else:
         verCoords = [(center[0],center[1] + tradeOffVer),(center[0],center[1] - tradeOffVer)]
 
-    print verCoords,"VERTICAL"
+    # print verCoords,"VERTICAL"
     distance = scipy.spatial.distance.euclidean(center,coord1) + tradeOffHor
 
     intercept = calcLineIntercept(slope,center[0],center[1])
@@ -186,53 +189,34 @@ def getCrimeArea(coord1, coord2):
     xcoords = numpy.roots([a,b,c])
 
     horCoords = [(xcoords[0],xcoords[0]*slope+intercept),(xcoords[1],xcoords[1]*slope+intercept)]
-    print horCoords,"HORIZONTAL"
+    # print horCoords,"HORIZONTAL"
 
-    # tradeOffrect = 0.0003
-    # rectangle = [(coord1[0]-tradeOffrect,coord1[1]-tradeOffrect),(coord2[0]+tradeOffrect,coord2[1]+tradeOffrect)]
-    # print rectangle,"BOUNDARY"
-    # intercept = calcLineIntercept(slopeP,horCoords[0][0],horCoords[0][1])
-    # a = 1 + slopeP**2
-    # b = 2 * (slopeP*(intercept - horCoords[0][1]) - horCoords[0][0])
-    # c = horCoords[0][1]**2 + intercept**2 + horCoords[0][1]**2 - (2*intercept*horCoords[0][1]) - distance**2
-    # rectangle.append(numpy.roots([a,b,c]))
-
-    # intercept = calcLineIntercept(slopeP,horCoords[1][0],horCoords[1][1])
-    # a = 1 + slopeP**2
-    # b = 2 * (slopeP*(intercept - horCoords[1][1]) - horCoords[1][0])
-    # c = horCoords[1][1]**2 + intercept**2 + horCoords[1][1]**2 - (2*intercept*horCoords[1][1]) - distance**2
-    # rectangle.append(numpy.roots([a,b,c]))
-
-    # print rectangle,"RECTANGLE"
-
-
-
-
-    crimeLocs = getCrimes(horCoords)
+    # crimeLocs = getCrimes(horCoords)
+    # crimeTypes = {}
     
-    print len(crimeLocs)
+
     # for loc in crimeLocs:
-    #     print str(loc[1])+","+str(loc[2])
-    # print [horCoords,verCoords]
-    for loc in crimeLocs:
-        if not drawParallelogram([horCoords,verCoords],loc):
-            crimeLocs.remove(loc)
-    
-    print len(crimeLocs)
-# 
-    for loc in crimeLocs:
-      print str(loc[1])+","+str(loc[2])
+    #     if str(loc[3])+" "+str(loc[4]) not in crimeTypes:
+    #         crimeTypes[str(loc[3])+" "+str(loc[4])] = 1
+    #         continue
+    #     crimeTypes[str(loc[3])+" "+str(loc[4])] += 1
 
-    return crimeLocs
+    # print crimeTypes
+
+    # return crimeLocs
+    return [horCoords,verCoords]
 
 
+
+# get crimes in the given perimeter
 def getCrimes(area):
     # print hor[1][0],hor[0][0],ver[0][1],ver[1][1]
-    conn = sqlite3.connect('../data/all_cities/crime.db')
+    conn = sqlite3.connect('data/all_cities/crime.db')
     c = conn.cursor()
-    print area[0][0],area[1][0],area[0][1],area[1][1]
-    c.execute("SELECT T.LID,T.LATITUDE,T.LONGITUDE,T.OFFENSE_ID FROM OFFENSE O,(SELECT L.ID LID,LATITUDE,LONGITUDE,OFFENSE_ID FROM LOCATION L,FACT F WHERE (LATITUDE BETWEEN "\
-        +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "+str(max(area[0][1],area[1][1]))+" AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
+    # print area[0][0],area[1][0],area[0][1],area[1][1]
+    c.execute("SELECT T.LID,T.LATITUDE,T.LONGITUDE,T.OFFENSE_ID,O.TYPE FROM OFFENSE O,(SELECT L.ID LID,LATITUDE,LONGITUDE,OFFENSE_ID FROM LOCATION L,FACT F WHERE (LATITUDE BETWEEN "\
+        +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "+str(max(area[0][1],area[1][1]))+\
+        " AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
     crimeLocs = []
     for row in c:       
         crimeLocs.append(row)
@@ -241,24 +225,24 @@ def getCrimes(area):
     return crimeLocs
 
 # def linePoint(bounds,loc):
-# 	slope = calcLineSlope(bounds[0][0],bounds[0][1],bounds[1][0],bounds[1][1])
-# 	return (slope - (loc[1]-bounds[1][1])/(loc[0]-bounds[1][0]))
+#   slope = calcLineSlope(bounds[0][0],bounds[0][1],bounds[1][0],bounds[1][1])
+#   return (slope - (loc[1]-bounds[1][1])/(loc[0]-bounds[1][0]))
 
 # def drawParallelogram(area,loc):
-# 	# line one h[0]-v[0]
-# 	if linePoint([area[0][0],area[1][0]],loc) < 0:
-# 		return False
-# 	# line two h[0]-v[1]
-# 	elif linePoint([area[0][0],area[1][1]],loc) > 0:
-# 		return False
-# 	# line three v[0]-h[1]
-# 	elif linePoint([area[1][0],area[0][1]],loc) < 0:
-# 		return False
-# 	# line four v[1]-h[1]
-# 	elif linePoint([area[1][1],area[0][1]],loc) < 0:
-# 		return False
-# 	else:
-# 		return True
+#   # line one h[0]-v[0]
+#   if linePoint([area[0][0],area[1][0]],loc) < 0:
+#       return False
+#   # line two h[0]-v[1]
+#   elif linePoint([area[0][0],area[1][1]],loc) > 0:
+#       return False
+#   # line three v[0]-h[1]
+#   elif linePoint([area[1][0],area[0][1]],loc) < 0:
+#       return False
+#   # line four v[1]-h[1]
+#   elif linePoint([area[1][1],area[0][1]],loc) < 0:
+#       return False
+#   else:
+#       return True
 
 
 
@@ -268,41 +252,90 @@ def getCrimes(area):
 #     acceptCrime = (((loc[0]-center[0])**2)/((bigAxis)**2) + ((loc[1]-center[1])**2)/((smallAxis)**2)) <= 1
 #     return acceptCrime
 
+
+
+# calculate line slope
 def calcLineSlope(x1, y1, x2, y2):
     if x1 == x2:
         return "infinite"
     return (y1 - y2)/float(x1 - x2)
 
+
+# calculate line intercept
 def calcLineIntercept(m,x,y):
     if m != "infinite":
             return y - m*x
     return 0
+
+
+# find midpoint    
 def getMidpoint(A, B):
     return ((A[0]+B[0])/float(2),(A[1]+B[1])/float(2))
 
+
+
+# dijkstra's algorithm
 def dijkstras(mapGraph,start,end):
     distance = {}
-
+    path = []
     for node in mapGraph.nodes:
         if node.reference != start.reference:
             distance[node.reference] = float("inf")
             continue
-        distance[node.reference] = 0
+        distance[start.reference] = 0
 
-    visitedNodes = set()
+    visitedNodes = []
     nodeQueue = mapGraph.nodes
 
-    while len(nodeQueue)  > 0:
-        closestNode = shortestPath(nodeQueue,distance)
-        visitedNodes = visitedNodes.union(closestNode) 
+    while len(nodeQueue):
+        safestNode = shortestPath(nodeQueue,distance)
+        visitedNodes.append(safestNode[0].reference)
+        nodeQueue.remove(safestNode[0])
 
-        for edge in mapGraph.edge:
-            if edge.node1.reference == closestNode.reference:
-            	if distance[node2] > distance[node1] + edge.crimeWeight
-            		distance[node2] = distance[node1] + edge.crimeWeight
-            elif edge.node2.reference == closestNode.reference:
-            	if distance[node1] > distance[node2] + edge.crimeWeight
-            		distance[node1] = distance[node2] + edge.crimeWeight
+        for edge in mapGraph.edges:
+            if safestNode[0].reference == edge.node1.reference:
+                if distance[edge.node2.reference] >= distance[safestNode[0].reference] + edge.crimeWeight:
+                    distance[edge.node2.reference] = distance[safestNode[0].reference] + edge.crimeWeight
+                    if edge.node2.reference == end.reference:
+                        path.append(safestNode[0].reference)
+            elif safestNode[0].reference == edge.node2.reference:
+                if distance[edge.node1.reference] >= distance[safestNode[0].reference] + edge.crimeWeight:
+                    distance[edge.node1.reference] = distance[safestNode[0].reference] + edge.crimeWeight
+                    if edge.node1.reference == end.reference:
+                        path.append(safestNode[0].reference)
+
+    if start.reference in path:
+        path.remove(start.reference)
+
+    # print visitedNodes,distance,path
+    return path
+
+
+
+# dijkstra's shortest path
+def shortestPath(queue,distance):
+    minWeight = float("inf")
+    reqNode = 0
+    for node in queue:
+        if minWeight >= distance[node.reference]:
+            minWeight = distance[node.reference]
+            reqNode = node
+
+    return (reqNode,minWeight) 
+
+
+
+# calculate weihgt for each crime
+def setcrimeWeights(count):
+    crimeType = {'Personal':['HOMICIDE','CRIM SEXUAL ASSAULT','HATECRIME','OFFENSE INVOLVING CHILDREN','CRIM SEX OFFENSE',\
+                'WEAPONS VIOLATION','ASSAULT'],'Property':['ROBBERY','BURGLARY','THEFT','BATTERY','']}
+    crimeWeights = {}
+    for crime in count:
+        if crime not in crimeWeights:
+            crimeWeights[crime] = 1
+
+    return crimeWeights
+    
 
                 
 
@@ -312,11 +345,13 @@ def dijkstras(mapGraph,start,end):
 
 def main():
     #extract_intersections('../../../../map1.osm')
-    # getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028))
-    nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5)),Node(6,(6,6))]
-    edges = [Edge(Node(1,(1,1)),Node(2,(2,2))),Edge(Node(2,(2,2)),Node(3,(3,3))),Edge(Node(3,(3,3)),Node(6,(6,6))),Edge(Node(1,(1,1)),Node(5,(5,5))),Edge(Node(5,(5,5)),Node(6,(6,6)))]
-    graph = Graph(nodes,edges)
-    dijkstras(graph)
+    getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028))
+    # nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5))]#,Node(6,(6,6))]
+    # edges = [Edge(1,Node(1,(1,1)),Node(2,(2,2)),3),Edge(2,Node(2,(2,2)),Node(4,(4,4)),1),Edge(3,Node(4,(4,4)),Node(5,(5,5)),2),Edge(4,Node(2,(2,2)),Node(3,(3,3)),1),Edge(5,Node(1,(1,1)),Node(3,(3,3)),1),Edge(6,Node(3,(3,3)),Node(5,(5,5)),4),Edge(7,Node(3,(3,3)),Node(4,(4,4)),3)]
+    # graph = Graph(nodes,edges)
+    # print "1"
+    # print dijkstras(graph,Node(1,(1,1)),Node(5,(5,5)))
+    # print "2"
 
-if __name__=="main":
-	main()
+if __name__=="__main__":
+    main()

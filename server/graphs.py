@@ -16,10 +16,11 @@ class Edge:
 	node2 = None
 	crimeWeight = 0
 
-	def __init__(self,node1,node2):
+	def __init__(self,reference,node1,node2,crimeWeight):
 		self.node1 = node1
 		self.node2 = node2
-		self.reference = node1.reference + node2.reference
+		self.reference = reference
+		self.crimeWeight = crimeWeight
 
 
 class Graph:
