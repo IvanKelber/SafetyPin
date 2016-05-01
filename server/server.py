@@ -82,7 +82,7 @@ def extract_intersections(osm, verbose=True):
                 inIntersections = counter[child.attrib['id']]
                 coordinate = child.attrib['lat'] + ',' + child.attrib['lon']
                 intersection_coordinates[child.attrib['id']]=coordinate
-                # print(coordinate)
+                # print(coordinatesdinate)
             except:
                 continue
 
@@ -102,15 +102,15 @@ def extract_intersections(osm, verbose=True):
             try:
                 intersections[bag[i]]
                 intersections[bag[i+1]]                             
-                edges.add(Edge(bag[i],bag[i+1],scipy.spatial.distance.euclidean(eval(intersection_coordinates[bag[i+1]]),eval(intersection_coordinates[bag[i]]))))
+                edges.add(Edge(bag[i],bag[i+1],1))#scipy.spatial.distance.euclidean(eval(intersection_coordinates[bag[i+1]]),eval(intersection_coordinates[bag[i]]))))
             except KeyError:
                 continue
 
     # print(len(nodes),len(edges))
-    # graph = Graph(nodes,edges)
-    # nodes = list(nodes)
+    graph = Graph(nodes,edges)
+    nodes = list(nodes)
     # print intersection_coordinates[nodes[0].reference],intersection_coordinates[nodes[len(nodes)-1].reference]
-    # print dijkstras(graph,nodes[0],nodes[len(nodes)-1])
+    print dijkstras(graph,nodes[0],nodes[len(nodes)-1])
 
     return intersection_coordinates
 
@@ -298,45 +298,61 @@ def dijkstras(mapGraph,start,end):
         safestNode = shortestPath(nodeQueue,distance)
         visitedNodes.append(safestNode[0].reference)
         nodeQueue.remove(safestNode[0])
-
+        # print "safestNode ",safestNode[0].reference,"distance ",distance[safestNode[0].reference]
         for edge in mapGraph.edges:
-            # print "visiting edge",edge.node1,"-",edge.node2,"weight ",edge.crimeWeight
+            # if safestNode[0].reference == end.reference:
+            #     print "end point"
+            # print "weights ",edge.crimeWeight,"node 1 ",edge.node1," and ",edge.node2  
             weight = distance[safestNode[0].reference] + edge.crimeWeight
             if safestNode[0].reference == edge.node1:
+                # print "IF visiting edge",safestNode[0].reference,"-",edge.node2,"weight ",edge.crimeWeight
                 # if edge.node1 not in visitedNodes:
-                if distance[edge.node2] >= weight:
+                if distance[edge.node2] > weight:
                     distance[edge.node2] = weight
                     path[edge.node2] = safestNode[0]
+                    print "******path******",distance[edge.node2]
             elif safestNode[0].reference == edge.node2:
+                # print "ELIF visiting edge",safestNode[0].reference,"-",edge.node1,"weight ",edge.crimeWeight
                 # if edge.node2 not in visitedNodes:
-                if distance[edge.node1] >= weight:
+                if distance[edge.node1] > weight:
                     distance[edge.node1] = weight
                     path[edge.node1] = safestNode[0]
+                    print "******path******",distance[edge.node1]
 
     # if start.reference in path:
     #     path.remove(start.reference)
 
-    # print visitedNodes,distance,path
-    latLngs = [end.coordinates]
-    temp = end.reference
+    # print distance
 
-    print len(path)
+    # for ref in path:
+    #     ref1 = path[ref]
+    #     if ref1 in path.keys():
+    #         if path[ref1] == ref:
+    #             print ref1,ref
 
-    # print temp,"temp"
-    soFar = []
+
+
+
+    # latLngs = [end.coordinates]
+    # temp = end.reference
+
+    # print len(path)
+
+    # # print temp,"temp"
+    # soFar = []
     # for k,v in path.items():
-    #     print k,v.reference
+    #     print k,v.coordinates,v.reference
 
-    while temp is not start.reference:
-      # print temp,start.reference,"inside"
-      print path[temp].coordinates
-      time.sleep(2)
-      latLngs.append(path[temp].coordinates)
-      temp = path[temp].reference
+    # while temp is not start.reference:
+    #   # print temp,start.reference,"inside"
+    #   print path[temp].coordinates
+    #   time.sleep(2)
+    #   latLngs.append(path[temp].coordinates)
+    #   temp = path[temp].reference
 
     # for lat in latLngs:
     #     print lat
-    return latLngs.reverse()
+    # return latLngs.reverse()
     # for node in path:
     #     print node,path[node].reference,path[node].coordinates
     # return path
@@ -375,13 +391,13 @@ def setcrimeWeights(count):
 
 
 def main():
-    extract_intersections('../../smallTest.osm')
+    extract_intersections('../../test.osm')
     # getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028))
-    # nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5))]#,Node(6,(6,6))]
-    # edges = [Edge(1,Node(1,(1,1)),Node(2,(2,2)),3),Edge(2,Node(2,(2,2)),Node(4,(4,4)),1),Edge(3,Node(4,(4,4)),Node(5,(5,5)),2),Edge(4,Node(2,(2,2)),Node(3,(3,3)),1),Edge(5,Node(1,(1,1)),Node(3,(3,3)),1),Edge(6,Node(3,(3,3)),Node(5,(5,5)),4),Edge(7,Node(3,(3,3)),Node(4,(4,4)),3)]
+    # nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5)),Node(6,(6,6))]
+    # edges = [Edge(Node(1,(1,1)),Node(2,(2,2)),2),Edge(Node(1,(1,1)),Node(5,(5,5)),5),Edge(Node(2,(2,2)),Node(3,(3,3)),8),Edge(Node(2,(2,2)),Node(4,(4,4)),1),Edge(Node(4,(4,4)),Node(5,(5,5)),1),Edge(Node(3,(3,3)),Node(4,(4,4)),3),Edge(Node(3,(3,3)),Node(6,(6,6)),10),Edge(Node(4,(4,4)),Node(6,(6,6)),2)]
     # graph = Graph(nodes,edges)
-    # print "1"
-    # print dijkstras(graph,Node(1,(1,1)),Node(5,(5,5)))
+    # # # print "1"
+    # print dijkstras(graph,Node(1,(1,1)),Node(6,(6,6)))
     # print "2"
 
 if __name__=="__main__":
