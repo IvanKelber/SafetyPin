@@ -92,27 +92,27 @@ def extract_intersections(osm, verbose=True):
     # print intersection_coordinates
 
 
-    nodes = set()
-    for ref in intersections:
-        nodes.add(Node(ref,intersection_coordinates[ref]))
+    # nodes = set()
+    # for ref in intersections:
+    #     nodes.add(Node(ref,intersection_coordinates[ref]))
 
-    edges = set()
-    for street,bag in streets.items():
-        for i in range(len(bag) - 1):
-            try:
-                intersections[bag[i]]
-                intersections[bag[i+1]]                             
-                edges.add(Edge(bag[i],bag[i+1],1))#scipy.spatial.distance.euclidean(eval(intersection_coordinates[bag[i+1]]),eval(intersection_coordinates[bag[i]]))))
-            except KeyError:
-                continue
+    # edges = set()
+    # for street,bag in streets.items():
+    #     for i in range(len(bag) - 1):
+    #         try:
+    #             intersections[bag[i]]
+    #             intersections[bag[i+1]]                             
+    #             edges.add(Edge(bag[i],bag[i+1],1))#scipy.spatial.distance.euclidean(eval(intersection_coordinates[bag[i+1]]),eval(intersection_coordinates[bag[i]]))))
+    #         except KeyError:
+    #             continue
 
-    # print(len(nodes),len(edges))
-    graph = Graph(nodes,edges)
-    nodes = list(nodes)
+    # # print(len(nodes),len(edges))
+    # graph = Graph(nodes,edges)
+    # nodes = list(nodes)
     # print intersection_coordinates[nodes[0].reference],intersection_coordinates[nodes[len(nodes)-1].reference]
     print dijkstras(graph,nodes[0],nodes[len(nodes)-1])
 
-    return intersection_coordinates
+    return intersection_coordinates,streets
 
 # N^2 booooo
 def findEndPoints(bag,coordinates):
