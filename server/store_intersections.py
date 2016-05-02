@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-
-
+import scipy
 from server import *
 import sys
 import csv
@@ -12,6 +11,7 @@ def main():
     start = time.clock()
     print "Extracting intersections and streets..."
     intersections, streets = extract_intersections(sys.argv[1])
+    print "break here"
     conn = sqlite3.connect("intersection.db")
     c = conn.cursor()
 
@@ -21,15 +21,16 @@ def main():
         WHERE type='table' \
         AND name='coords'").fetchone() is None:
         c.execute("CREATE TABLE nodes \
-            (ref INT PRIMARY KEY, location VARCHAR)")
+            (ref INT PRIMARY KEY, latitude REAL, longitude REAL)")
         c.execute("CREATE TABLE edges \
-            (ref1 INT, ref2 INT, PRIMARY KEY(ref1,ref2))")
+            (ref1 INT, ref2 INT, length REAL PRIMARY KEY(ref1,ref2))")
 
     print "Storing intersections as nodes..."
     for intersection,coordinates in intersections.items():
         try:
             c.execute("INSERT into nodes\
-                VALUES(?,?)", (intersection,coordinates))
+                VALUES(?,?,?)", (intersection,eval(coordinates)[0],eval(coordinates)[1]))
+
         except sqlite3.IntegrityError:
             print "Not unique:",intersection,coordinates
             continue

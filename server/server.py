@@ -56,6 +56,7 @@ def extract_intersections(osm, verbose=True):
                 for item in child:
                     if item.tag == 'nd':
                         nd_ref = item.attrib['ref']
+                        # print nd_ref
                         if not nd_ref in counter:
                             counter[nd_ref] = 0
                         counter[nd_ref] += 1
@@ -86,11 +87,28 @@ def extract_intersections(osm, verbose=True):
             except:
                 continue
 
+    # print intersection_coordinates
+    # print "###########################"
+    newStreets = {}
+
     # For every street, order the intersections so that each is connected.
-    for street,bag in streets.items():
+    for street in streets:
+        temp = list(streets[street])
+        newStreets[street] = {}
+        for node in range(len(temp)):
+            for intersection,coordinates in intersection_coordinates.items():
+                if temp[node] == intersection:
+                    newStreets[street][temp[node]] = coordinates
+    # print newStreets
+
+
+
+
+    for street,bag in newStreets.items():
+        # print bag
         streets[street] = findOrder(bag,intersection_coordinates)
     # print intersection_coordinates
-    print streets
+    # print streets
 
 
     nodes = set()
@@ -109,11 +127,12 @@ def extract_intersections(osm, verbose=True):
 
     # print(len(nodes),len(edges))
     
-    graph = Graph(nodes,edges)
-    nodes = list(nodes)
-    print intersection_coordinates[nodes[0].reference],intersection_coordinates[nodes[len(nodes)-1].reference]
-    print dijkstras(graph,nodes[0],nodes[len(nodes)-1])
-
+    # graph = Graph(nodes,edges)
+    # nodes = list(nodes)
+    # print intersection_coordinates[nodes[0].reference],intersection_coordinates[nodes[len(nodes)-1].reference]
+    # print dijkstras(graph,nodes[0],nodes[len(nodes)-1])
+    # print intersection_coordinates
+    # print edges
     return intersection_coordinates,streets
 
 # N^2 booooo
@@ -167,8 +186,6 @@ def findOrder(bag,coordinates):
 
 # returns four lat-long pairs between two input 
 def getCrimeArea(coord1, coord2,tradeOffVer,tradeOffHor):
-    tradeOffVer = 0.00003
-    tradeOffHor = 0.003
 
     slope = calcLineSlope(coord1[0],coord1[1],coord2[0],coord2[1])
     center = getMidpoint(coord1,coord2)
@@ -364,12 +381,12 @@ def dijkstras(mapGraph,start,end):
     # for k,v in path.items():
     #     print k,v.coordinates,v.reference
 
-    while temp is not start.reference:
-      # print temp,start.reference,"inside"
-      print path[temp].coordinates
-      time.sleep(2)
-      latLngs.append(path[temp].coordinates)
-      temp = path[temp]
+    # while temp is not start.reference:
+    #   # print temp,start.reference,"inside"
+    #   print path[temp].coordinates
+    #   time.sleep(2)
+    #   latLngs.append(path[temp].coordinates)
+    #   temp = path[temp]
 
     # for lat in latLngs:
     #     print lat
@@ -433,10 +450,10 @@ def setedgeWeight(intersection1,intersection2,crimeLocs):
 
 
 def main():
-    # extract_intersections('../../test.osm')
+    extract_intersections('../../test.osm')
     
     # pass two coordinates and the tradeoffs
-    getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028),0.00003,0.003)
+    # getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028),0.00003,0.003)
 
     # nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5)),Node(6,(6,6))]
     # edges = [Edge(Node(1,(1,1)),Node(2,(2,2)),2),Edge(Node(1,(1,1)),Node(5,(5,5)),5),Edge(Node(2,(2,2)),Node(3,(3,3)),8),Edge(Node(2,(2,2)),Node(4,(4,4)),1),Edge(Node(4,(4,4)),Node(5,(5,5)),1),Edge(Node(3,(3,3)),Node(4,(4,4)),3),Edge(Node(3,(3,3)),Node(6,(6,6)),10),Edge(Node(4,(4,4)),Node(6,(6,6)),2)]
