@@ -90,6 +90,7 @@ def extract_intersections(osm, verbose=True):
     for street,bag in streets.items():
         streets[street] = findOrder(bag,intersection_coordinates)
     # print intersection_coordinates
+    print streets
 
 
     nodes = set()
@@ -111,7 +112,7 @@ def extract_intersections(osm, verbose=True):
     graph = Graph(nodes,edges)
     nodes = list(nodes)
     print intersection_coordinates[nodes[0].reference],intersection_coordinates[nodes[len(nodes)-1].reference]
-    print dijkstras(graph,nodes[1],nodes[len(nodes)-1])
+    print dijkstras(graph,nodes[0],nodes[len(nodes)-1])
 
     return intersection_coordinates,streets
 
@@ -165,7 +166,7 @@ def findOrder(bag,coordinates):
 
 
 # returns four lat-long pairs between two input 
-def getCrimeArea(coord1, coord2):
+def getCrimeArea(coord1, coord2,tradeOffVer,tradeOffHor):
     tradeOffVer = 0.00003
     tradeOffHor = 0.003
 
@@ -214,7 +215,7 @@ def getCrimeArea(coord1, coord2):
     # print crimeTypes
 
     # return crimeLocs
-    return [horCoords,verCoords]
+    print [horCoords,verCoords]
 
 
 
@@ -234,25 +235,25 @@ def getCrimes(area):
 
     return crimeLocs
 
-# def linePoint(bounds,loc):
-#   slope = calcLineSlope(bounds[0][0],bounds[0][1],bounds[1][0],bounds[1][1])
-#   return (slope - (loc[1]-bounds[1][1])/(loc[0]-bounds[1][0]))
+def linePoint(bounds,loc):
+  slope = calcLineSlope(bounds[0][0],bounds[0][1],bounds[1][0],bounds[1][1])
+  return (slope - (loc[1]-bounds[1][1])/(loc[0]-bounds[1][0]))
 
-# def drawParallelogram(area,loc):
-#   # line one h[0]-v[0]
-#   if linePoint([area[0][0],area[1][0]],loc) < 0:
-#       return False
-#   # line two h[0]-v[1]
-#   elif linePoint([area[0][0],area[1][1]],loc) > 0:
-#       return False
-#   # line three v[0]-h[1]
-#   elif linePoint([area[1][0],area[0][1]],loc) < 0:
-#       return False
-#   # line four v[1]-h[1]
-#   elif linePoint([area[1][1],area[0][1]],loc) < 0:
-#       return False
-#   else:
-#       return True
+def drawParallelogram(area,loc):
+  # line one h[0]-v[0]
+  if linePoint([area[0][0],area[1][0]],loc) < 0:
+      return False
+  # line two h[0]-v[1]
+  elif linePoint([area[0][0],area[1][1]],loc) > 0:
+      return False
+  # line three v[0]-h[1]
+  elif linePoint([area[1][0],area[0][1]],loc) < 0:
+      return False
+  # line four v[1]-h[1]
+  elif linePoint([area[1][1],area[0][1]],loc) < 0:
+      return False
+  else:
+      return True
 
 
 
@@ -299,15 +300,16 @@ def dijkstras(mapGraph,start,end):
     visitedNodes = []
     nodeQueue = mapGraph.nodes
     i = 1
-    print len(mapGraph.edges)," edges"
-    print len(mapGraph.nodes)," nodes"
-    for node in mapGraph.nodes:
-    	print node.coordinates
-    	i += 1
+    # print len(mapGraph.edges)," edges"
+    # print len(mapGraph.nodes)," nodes"
+    # for node in mapGraph.nodes:
+    #   for edge in mapGraph.edges:
+    #       print node.coordinates
+        # i += 1
     i = 1
-    for edge in mapGraph.edges:
-    	print i," node 1 ",edge.node1," - node 2 ",edge.node2," weight ",edge.crimeWeight
-    	i += 1
+    # for edge in mapGraph.edges:
+    #   print i," node 1 ",edge.node1," - node 2 ",edge.node2," weight ",edge.crimeWeight
+    #   i += 1
 
     while len(nodeQueue):
         safestNode = shortestPath(nodeQueue,distance)
@@ -316,32 +318,32 @@ def dijkstras(mapGraph,start,end):
 
         # print "safestNode ",safestNode[0].reference,"distance ",distance[safestNode[0].reference]
         for edge in mapGraph.edges:
-			# if '42437067' == edge.node1 or '42437067' == edge.node2:
-			# print edge.node1,"-",edge.node2,"weight ",edge.crimeeWeight
-			# if safestNode[0].reference == end.reference:
-			#     print "end point"
-			# print "weights ",edge.crimeWeight,"node 1 ",edge.node1," and ",edge.node2  
-			weight = distance[safestNode[0].reference] + edge.crimeWeight
-			if safestNode[0].reference == edge.node1:
-			    # print "IF visiting edge",safestNode[0].reference,"-",edge.node2,"weight ",edge.crimeWeight
-			    # if edge.node1 not in visitedNodes:
-			    if distance[edge.node2] > weight:
-			        distance[edge.node2] = weight
-			        path[edge.node2] = safestNode[0].reference
-			        # print "******path******",distance[edge.node2]
-			elif safestNode[0].reference == edge.node2:
-			    # print "ELIF visiting edge",safestNode[0].reference,"-",edge.node1,"weight ",edge.crimeWeight
-			    # if edge.node2 not in visitedNodes:
-			    if distance[edge.node1] > weight:
-			        distance[edge.node1] = weight
-			        path[edge.node1] = safestNode[0].reference
+            # if '42437067' == edge.node1 or '42437067' == edge.node2:
+            # print edge.node1,"-",edge.node2,"weight ",edge.crimeeWeight
+            # if safestNode[0].reference == end.reference:
+            #     print "end point"
+            # print "weights ",edge.crimeWeight,"node 1 ",edge.node1," and ",edge.node2  
+            weight = distance[safestNode[0].reference] + edge.crimeWeight
+            if safestNode[0].reference == edge.node1:
+                # print "IF visiting edge",safestNode[0].reference,"-",edge.node2,"weight ",edge.crimeWeight
+                # if edge.node1 not in visitedNodes:
+                if distance[edge.node2] > weight:
+                    distance[edge.node2] = weight
+                    path[edge.node2] = safestNode[0]
+                    # print "******path******",distance[edge.node2]
+            elif safestNode[0].reference == edge.node2:
+                # print "ELIF visiting edge",safestNode[0].reference,"-",edge.node1,"weight ",edge.crimeWeight
+                # if edge.node2 not in visitedNodes:
+                if distance[edge.node1] > weight:
+                    distance[edge.node1] = weight
+                    path[edge.node1] = safestNode[0]
                     # print "******path******",distance[edge.node1]
 
     # if start.reference in path:
     #     path.remove(start.reference)
 
-    print distance
-    print path
+    # print distance
+    # print path
 
     # for ref in path:
     #     ref1 = path[ref]
@@ -352,8 +354,8 @@ def dijkstras(mapGraph,start,end):
 
 
 
-    # latLngs = [end.coordinates]
-    # temp = end.reference
+    latLngs = [end.coordinates]
+    temp = end.reference
 
     # print len(path)
 
@@ -362,12 +364,12 @@ def dijkstras(mapGraph,start,end):
     # for k,v in path.items():
     #     print k,v.coordinates,v.reference
 
-    # while temp is not start.reference:
-    #   # print temp,start.reference,"inside"
-    #   print path[temp].coordinates
-    #   time.sleep(2)
-    #   latLngs.append(path[temp].coordinates)
-    #   temp = path[temp].reference
+    while temp is not start.reference:
+      # print temp,start.reference,"inside"
+      print path[temp].coordinates
+      time.sleep(2)
+      latLngs.append(path[temp].coordinates)
+      temp = path[temp]
 
     # for lat in latLngs:
     #     print lat
@@ -391,7 +393,7 @@ def shortestPath(queue,distance):
 
 
 
-# calculate weihgt for each crime
+# calculate weight for each crime
 def setcrimeWeights(count):
     crimeType = {'Personal':['HOMICIDE','CRIM SEXUAL ASSAULT','HATECRIME','OFFENSE INVOLVING CHILDREN','CRIM SEX OFFENSE',\
                 'WEAPONS VIOLATION','ASSAULT'],'Property':['ROBBERY','BURGLARY','THEFT','BATTERY','']}
@@ -401,6 +403,27 @@ def setcrimeWeights(count):
             crimeWeights[crime] = 1
 
     return crimeWeights
+
+
+
+# calculate weight for each edge
+def setedgeWeight(intersection1,intersection2,crimeLocs):
+
+	# calculate regoin around the edge
+	tradeOffVer = 0
+	tradeOffHor = 0
+	area = getCrimeArea(intersection1,intersection2,tradeOffVer,tradeOffHor)
+	weight = 0
+	for loc in crimeLocs:
+		# accept crime if inside the boundary
+		
+		# weight crime based on severity and frequency 
+		# weight = 
+		pass
+
+
+
+
     
 
                 
@@ -410,8 +433,11 @@ def setcrimeWeights(count):
 
 
 def main():
-    extract_intersections('../../test.osm')
-    # getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028))
+    # extract_intersections('../../test.osm')
+    
+    # pass two coordinates and the tradeoffs
+    getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028),0.00003,0.003)
+
     # nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5)),Node(6,(6,6))]
     # edges = [Edge(Node(1,(1,1)),Node(2,(2,2)),2),Edge(Node(1,(1,1)),Node(5,(5,5)),5),Edge(Node(2,(2,2)),Node(3,(3,3)),8),Edge(Node(2,(2,2)),Node(4,(4,4)),1),Edge(Node(4,(4,4)),Node(5,(5,5)),1),Edge(Node(3,(3,3)),Node(4,(4,4)),3),Edge(Node(3,(3,3)),Node(6,(6,6)),10),Edge(Node(4,(4,4)),Node(6,(6,6)),2)]
     # graph = Graph(nodes,edges)
