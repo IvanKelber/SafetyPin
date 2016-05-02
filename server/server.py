@@ -92,25 +92,26 @@ def extract_intersections(osm, verbose=True):
     # print intersection_coordinates
 
 
-    # nodes = set()
-    # for ref in intersections:
-    #     nodes.add(Node(ref,intersection_coordinates[ref]))
+    nodes = set()
+    for ref in intersections:
+        nodes.add(Node(ref,intersection_coordinates[ref]))
 
-    # edges = set()
-    # for street,bag in streets.items():
-    #     for i in range(len(bag) - 1):
-    #         try:
-    #             intersections[bag[i]]
-    #             intersections[bag[i+1]]                             
-    #             edges.add(Edge(bag[i],bag[i+1],1))#scipy.spatial.distance.euclidean(eval(intersection_coordinates[bag[i+1]]),eval(intersection_coordinates[bag[i]]))))
-    #         except KeyError:
-    #             continue
+    edges = set()
+    for street,bag in streets.items():
+        for i in range(len(bag) - 1):
+            try:
+                intersections[bag[i]]
+                intersections[bag[i+1]]                             
+                edges.add(Edge(bag[i],bag[i+1],1))#scipy.spatial.distance.euclidean(eval(intersection_coordinates[bag[i+1]]),eval(intersection_coordinates[bag[i]]))))
+            except KeyError:
+                continue
 
-    # # print(len(nodes),len(edges))
-    # graph = Graph(nodes,edges)
-    # nodes = list(nodes)
-    # print intersection_coordinates[nodes[0].reference],intersection_coordinates[nodes[len(nodes)-1].reference]
-    print dijkstras(graph,nodes[0],nodes[len(nodes)-1])
+    # print(len(nodes),len(edges))
+    
+    graph = Graph(nodes,edges)
+    nodes = list(nodes)
+    print intersection_coordinates[nodes[0].reference],intersection_coordinates[nodes[len(nodes)-1].reference]
+    print dijkstras(graph,nodes[1],nodes[len(nodes)-1])
 
     return intersection_coordinates,streets
 
@@ -297,36 +298,50 @@ def dijkstras(mapGraph,start,end):
 
     visitedNodes = []
     nodeQueue = mapGraph.nodes
+    i = 1
+    print len(mapGraph.edges)," edges"
+    print len(mapGraph.nodes)," nodes"
+    for node in mapGraph.nodes:
+    	print node.coordinates
+    	i += 1
+    i = 1
+    for edge in mapGraph.edges:
+    	print i," node 1 ",edge.node1," - node 2 ",edge.node2," weight ",edge.crimeWeight
+    	i += 1
 
     while len(nodeQueue):
         safestNode = shortestPath(nodeQueue,distance)
         visitedNodes.append(safestNode[0].reference)
         nodeQueue.remove(safestNode[0])
+
         # print "safestNode ",safestNode[0].reference,"distance ",distance[safestNode[0].reference]
         for edge in mapGraph.edges:
-            # if safestNode[0].reference == end.reference:
-            #     print "end point"
-            # print "weights ",edge.crimeWeight,"node 1 ",edge.node1," and ",edge.node2  
-            weight = distance[safestNode[0].reference] + edge.crimeWeight
-            if safestNode[0].reference == edge.node1:
-                # print "IF visiting edge",safestNode[0].reference,"-",edge.node2,"weight ",edge.crimeWeight
-                # if edge.node1 not in visitedNodes:
-                if distance[edge.node2] > weight:
-                    distance[edge.node2] = weight
-                    path[edge.node2] = safestNode[0]
-                    print "******path******",distance[edge.node2]
-            elif safestNode[0].reference == edge.node2:
-                # print "ELIF visiting edge",safestNode[0].reference,"-",edge.node1,"weight ",edge.crimeWeight
-                # if edge.node2 not in visitedNodes:
-                if distance[edge.node1] > weight:
-                    distance[edge.node1] = weight
-                    path[edge.node1] = safestNode[0]
-                    print "******path******",distance[edge.node1]
+			# if '42437067' == edge.node1 or '42437067' == edge.node2:
+			# print edge.node1,"-",edge.node2,"weight ",edge.crimeeWeight
+			# if safestNode[0].reference == end.reference:
+			#     print "end point"
+			# print "weights ",edge.crimeWeight,"node 1 ",edge.node1," and ",edge.node2  
+			weight = distance[safestNode[0].reference] + edge.crimeWeight
+			if safestNode[0].reference == edge.node1:
+			    # print "IF visiting edge",safestNode[0].reference,"-",edge.node2,"weight ",edge.crimeWeight
+			    # if edge.node1 not in visitedNodes:
+			    if distance[edge.node2] > weight:
+			        distance[edge.node2] = weight
+			        path[edge.node2] = safestNode[0].reference
+			        # print "******path******",distance[edge.node2]
+			elif safestNode[0].reference == edge.node2:
+			    # print "ELIF visiting edge",safestNode[0].reference,"-",edge.node1,"weight ",edge.crimeWeight
+			    # if edge.node2 not in visitedNodes:
+			    if distance[edge.node1] > weight:
+			        distance[edge.node1] = weight
+			        path[edge.node1] = safestNode[0].reference
+                    # print "******path******",distance[edge.node1]
 
     # if start.reference in path:
     #     path.remove(start.reference)
 
-    # print distance
+    print distance
+    print path
 
     # for ref in path:
     #     ref1 = path[ref]
