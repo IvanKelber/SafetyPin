@@ -94,36 +94,42 @@ def extract_intersections(osm, verbose=True):
     # For every street, order the intersections so that each is connected.
     for street in streets:
         temp = list(streets[street])
-        newStreets[street] = {}
+        newStreets[street] = []
         for node in range(len(temp)):
             for intersection,coordinates in intersection_coordinates.items():
                 if temp[node] == intersection:
-                    newStreets[street][temp[node]] = coordinates
+                    newStreets[street].append((intersection,coordinates))
+    # print newStreets
+    # t = newStreets
     # print newStreets
 
 
-
-
+    # print newStreets
+    finalStreets = {}
     for street,bag in newStreets.items():
-        # print bag
-        streets[street] = findOrder(bag,intersection_coordinates)
+        # print bag == findOrder(bag,intersection_coordinates)
+        finalStreets[street] = findOrder(bag,intersection_coordinates)
+        # print "#############"
+        # print newStreets[street]
     # print intersection_coordinates
-    # print streets
+    # print finalStreets == t
 
+    # print newStreets
+    # print t == newStreets
 
-    nodes = set()
-    for ref in intersections:
-        nodes.add(Node(ref,intersection_coordinates[ref]))
+    # nodes = set()
+    # for ref in intersections:
+    #     nodes.add(Node(ref,intersection_coordinates[ref]))
 
-    edges = set()
-    for street,bag in streets.items():
-        for i in range(len(bag) - 1):
-            try:
-                intersections[bag[i]]
-                intersections[bag[i+1]]                             
-                edges.add(Edge(bag[i],bag[i+1],1))#scipy.spatial.distance.euclidean(eval(intersection_coordinates[bag[i+1]]),eval(intersection_coordinates[bag[i]]))))
-            except KeyError:
-                continue
+    # edges = set()
+    # for street,bag in streets.items():
+    #     for i in range(len(bag) - 1):
+    #         try:
+    #             intersections[bag[i]]
+    #             intersections[bag[i+1]]                             
+    #             edges.add(Edge(bag[i],bag[i+1],1))#scipy.spatial.distance.euclidean(eval(intersection_coordinates[bag[i+1]]),eval(intersection_coordinates[bag[i]]))))
+    #         except KeyError:
+    #             continue
 
     # print(len(nodes),len(edges))
     
@@ -133,27 +139,33 @@ def extract_intersections(osm, verbose=True):
     # print dijkstras(graph,nodes[0],nodes[len(nodes)-1])
     # print intersection_coordinates
     # print edges
-    return intersection_coordinates,streets
+    # print intersection_coordinates.keys()
+    # print "*******"
+    # print finalStreets
+    return intersection_coordinates,finalStreets
 
 # N^2 booooo
 def findEndPoints(bag,coordinates):
     biggest = 0
     biggestEndpoints = []
+    # print coordinates
+    # pass
     for int1 in bag:
         for int2 in bag:
             if int1 != int2:
                 coord1success = False  
                 try:                 
-                    coord1 = eval(coordinates[int1])
+                    coord1 = eval(coordinates[int1[0]])
+                    # print coord1
                     coord1success = True
-                    coord2 = eval(coordinates[int2])
+                    coord2 = eval(coordinates[int2[0]])
                     distance = scipy.spatial.distance.euclidean(coord1,coord2)
                     biggest = max(distance,biggest)
                     if biggest == distance:
-                        biggestEndpoints = [int1,int2]
+                        biggestEndpoints = [int1[0],int2[0]]
                 except KeyError:
                     if biggest == 0:
-                        biggestEndpoints = [int1,int2]
+                        biggestEndpoints = [int1[0],int2[0]]
                     continue        
     return biggestEndpoints
       
@@ -164,14 +176,13 @@ def findOrder(bag,coordinates):
     except KeyError:
         endCoordinate = eval(coordinates[endPoints[1]])
     except IndexError:
-        # print bag,endPoints 
         (i,) = bag
         return [i]
     orderedDict = {}
     finalOrder = []
     for intersection in bag:
         try:
-            coord = eval(coordinates[intersection])        
+            coord = eval(coordinates[intersection[0]])        
             distance = scipy.spatial.distance.euclidean(coord,endCoordinate)
             orderedDict[intersection] = distance
         except KeyError:
@@ -184,12 +195,11 @@ def findOrder(bag,coordinates):
 
 
 
-# returns four lat-long pairs between two input 
-def getCrimeArea(coord1, coord2,tradeOffVer,tradeOffHor):
+# returns four lat-long pairs between two inputs 
+def getArea(coord1, coord2,tradeOffVer,tradeOffHor):
 
     slope = calcLineSlope(coord1[0],coord1[1],coord2[0],coord2[1])
     center = getMidpoint(coord1,coord2)
-    # print center,"CENTER"
 
     if slope != 0:
         if slope != "infinite":
@@ -207,7 +217,6 @@ def getCrimeArea(coord1, coord2,tradeOffVer,tradeOffHor):
     else:
         verCoords = [(center[0],center[1] + tradeOffVer),(center[0],center[1] - tradeOffVer)]
 
-    # print verCoords,"VERTICAL"
     distance = scipy.spatial.distance.euclidean(center,coord1) + tradeOffHor
 
     intercept = calcLineIntercept(slope,center[0],center[1])
@@ -217,31 +226,18 @@ def getCrimeArea(coord1, coord2,tradeOffVer,tradeOffHor):
     xcoords = numpy.roots([a,b,c])
 
     horCoords = [(xcoords[0],xcoords[0]*slope+intercept),(xcoords[1],xcoords[1]*slope+intercept)]
-    # print horCoords,"HORIZONTAL"
 
-    # crimeLocs = getCrimes(horCoords)
-    # crimeTypes = {}
-    
+    return [horCoords,verCoords]
 
-    # for loc in crimeLocs:
-    #     if str(loc[3])+" "+str(loc[4]) not in crimeTypes:
-    #         crimeTypes[str(loc[3])+" "+str(loc[4])] = 1
-    #         continue
-    #     crimeTypes[str(loc[3])+" "+str(loc[4])] += 1
-
-    # print crimeTypes
-
-    # return crimeLocs
-    print [horCoords,verCoords]
 
 
 
 # get crimes in the given perimeter
 def getCrimes(area):
-    # print hor[1][0],hor[0][0],ver[0][1],ver[1][1]
     conn = sqlite3.connect('data/all_cities/crime.db')
     c = conn.cursor()
-    # print area[0][0],area[1][0],area[0][1],area[1][1]
+    print area
+    print area[0][0],area[1][0],area[0][1],area[1][1]
     c.execute("SELECT T.LID,T.LATITUDE,T.LONGITUDE,T.OFFENSE_ID,O.TYPE FROM OFFENSE O,(SELECT L.ID LID,LATITUDE,LONGITUDE,OFFENSE_ID FROM LOCATION L,FACT F WHERE (LATITUDE BETWEEN "\
         +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "+str(max(area[0][1],area[1][1]))+\
         " AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
@@ -252,33 +248,54 @@ def getCrimes(area):
 
     return crimeLocs
 
+
+
+
+# get intersections in given perimeter
+def getIntersections(area):
+    conn = sqlite3.connect('server/intersection.db')
+    c = conn.cursor()
+    # print area
+    # print area[0][0],area[1][0],area[0][1],area[1][1]
+    c.execute("SELECT LATITUDE,LONGITUDE FROM NODES WHERE (LATITUDE BETWEEN "\
+        +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "\
+        +str(max(area[0][1],area[1][1]))+")")
+    intersectionLocs = []
+    for row in c:       
+        intersectionLocs.append(row)
+    conn.close()
+
+    return intersectionLocs
+
+
+
+
+# given a line and a point check where the point is w.r.t the line
 def linePoint(bounds,loc):
   slope = calcLineSlope(bounds[0][0],bounds[0][1],bounds[1][0],bounds[1][1])
-  return (slope - (loc[1]-bounds[1][1])/(loc[0]-bounds[1][0]))
+  intercept = calcLineIntercept(slope,bounds[0][0],bounds[0][1])
+  
+  return (loc[1] - (slope*loc[0] + intercept))
 
+
+
+# draw parallelogram given two points
 def drawParallelogram(area,loc):
   # line one h[0]-v[0]
-  if linePoint([area[0][0],area[1][0]],loc) < 0:
+  if linePoint([area[0][0],area[1][0]],loc) > 0:
       return False
   # line two h[0]-v[1]
-  elif linePoint([area[0][0],area[1][1]],loc) > 0:
+  elif linePoint([area[0][0],area[1][1]],loc) < 0:
       return False
   # line three v[0]-h[1]
-  elif linePoint([area[1][0],area[0][1]],loc) < 0:
+  elif linePoint([area[1][0],area[0][1]],loc) > 0:
       return False
   # line four v[1]-h[1]
-  elif linePoint([area[1][1],area[0][1]],loc) < 0:
+  elif linePoint([area[1][1],area[0][1]],loc) <  0:
       return False
   else:
       return True
 
-
-
-# def drawElipse(center,a,b,loc):
-#     smallAxis = scipy.spatial.distance.euclidean(center,b)
-#     bigAxis = scipy.spatial.distance.euclidean(center,a)
-#     acceptCrime = (((loc[0]-center[0])**2)/((bigAxis)**2) + ((loc[1]-center[1])**2)/((smallAxis)**2)) <= 1
-#     return acceptCrime
 
 
 
@@ -426,17 +443,18 @@ def setcrimeWeights(count):
 # calculate weight for each edge
 def setedgeWeight(intersection1,intersection2,crimeLocs):
 
-	# calculate regoin around the edge
-	tradeOffVer = 0
-	tradeOffHor = 0
-	area = getCrimeArea(intersection1,intersection2,tradeOffVer,tradeOffHor)
-	weight = 0
-	for loc in crimeLocs:
-		# accept crime if inside the boundary
-		
-		# weight crime based on severity and frequency 
-		# weight = 
-		pass
+    # calculate region around the edge
+    tradeOffVer = 0
+    tradeOffHor = 0
+    area = getArea(intersection1,intersection2,tradeOffVer,tradeOffHor)
+    weight = 0
+
+    for loc in crimeLocs:
+        # accept crime if inside the boundary
+        
+        # weight crime based on severity and frequency 
+        # weight = 
+        pass
 
 
 
@@ -450,10 +468,49 @@ def setedgeWeight(intersection1,intersection2,crimeLocs):
 
 
 def main():
-    extract_intersections('../../test.osm')
+    # extract_intersections('../../test.osm')
     
     # pass two coordinates and the tradeoffs
-    # getCrimeArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028),0.00003,0.003)
+    # area = getArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028),0.00003,0.003)
+    # horDistance = scipy.spatial.distance.euclidean(area[0][0],area[0][1])
+    # verDistance = scipy.spatial.distance.euclidean(area[1][0],area[1][1])
+    # if horDistance > verDistance:
+    # 	crimeLocs = getCrimes(area[0])
+    # else:
+    # 	crimeLocs = getCrimes(area[1])
+    # # crimeTypes = {}
+    
+    # print len(crimeLocs)
+    # for loc in crimeLocs:
+    # 	if not drawParallelogram(area,(loc[1],loc[2])):
+    # 		crimeLocs.remove(loc)
+    # print len(crimeLocs)
+    # for loc in crimeLocs:
+    # 	print str(loc[1])+","+str(loc[2])
+
+    area = getArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028),0.00003,0.0)
+    horDistance = scipy.spatial.distance.euclidean(area[0][0],area[0][1])
+    verDistance = scipy.spatial.distance.euclidean(area[1][0],area[1][1])
+    if horDistance > verDistance:
+    	crimeLocs = getIntersections(area[0])
+    else:
+    	crimeLocs = getIntersections(area[1])
+    # crimeTypes = {}
+    
+    print len(crimeLocs)
+    for loc in crimeLocs:
+    	if not drawParallelogram(area,(loc[0],loc[1])):
+    		crimeLocs.remove(loc)
+    print len(crimeLocs)
+    for loc in crimeLocs:
+    	print str(loc[0])+","+str(loc[1])
+    	# print str(loc[3])+" "+str(loc[4]) 
+    #     if str(loc[3])+" "+str(loc[4]) not in crimeTypes:
+    #         crimeTypes[str(loc[3])+" "+str(loc[4])] = 1
+    #         continue
+    #     crimeTypes[str(loc[3])+" "+str(loc[4])] += 1
+
+    # print crimeTypes
 
     # nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5)),Node(6,(6,6))]
     # edges = [Edge(Node(1,(1,1)),Node(2,(2,2)),2),Edge(Node(1,(1,1)),Node(5,(5,5)),5),Edge(Node(2,(2,2)),Node(3,(3,3)),8),Edge(Node(2,(2,2)),Node(4,(4,4)),1),Edge(Node(4,(4,4)),Node(5,(5,5)),1),Edge(Node(3,(3,3)),Node(4,(4,4)),3),Edge(Node(3,(3,3)),Node(6,(6,6)),10),Edge(Node(4,(4,4)),Node(6,(6,6)),2)]

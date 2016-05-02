@@ -23,13 +23,14 @@ def main():
         c.execute("CREATE TABLE nodes \
             (ref INT PRIMARY KEY, latitude REAL, longitude REAL)")
         c.execute("CREATE TABLE edges \
-            (ref1 INT, ref2 INT, length REAL PRIMARY KEY(ref1,ref2))")
+            (ref1 INT, ref2 INT, lat1 REAL, long1 REAL, lat2 REAL, long2 REAL,length REAL, PRIMARY KEY(ref1,ref2))")
 
     print "Storing intersections as nodes..."
     for intersection,coordinates in intersections.items():
+        coord = eval(coordinates)
         try:
             c.execute("INSERT into nodes\
-                VALUES(?,?,?)", (intersection,eval(coordinates)[0],eval(coordinates)[1]))
+                VALUES(?,?,?)", (intersection,coord[0],coord[1]))
 
         except sqlite3.IntegrityError:
             print "Not unique:",intersection,coordinates
@@ -39,10 +40,13 @@ def main():
     for street,bag in streets.items():
         for i in range(len(bag) - 1):
             try:
-                intersections[bag[i]]
-                intersections[bag[i+1]]                             
+                intersections[bag[i][0]]
+                intersections[bag[i+1][0]]
+                coord1 = eval(bag[i][1])
+                coord2 = eval(bag[i+1][1])                             
+                distance = scipy.spatial.distance.euclidean(coord1,coord2)
                 c.execute("INSERT into edges\
-                    VALUES(?,?)",(bag[i],bag[i+1]))
+                    VALUES(?,?,?,?,?,?,?)",(bag[i][0],bag[i+1][0],coord1[0],coord1[1],coord2[0],coord2[1],distance))
             except KeyError:
                 continue
             except sqlite3.IntegrityError:
