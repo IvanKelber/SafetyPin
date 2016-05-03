@@ -359,6 +359,9 @@ def spitCoords(start,end):
     else:
         crimeLocs = getCrimes(crimeArea[1]) 
 
+    for loc in crimeLocs:
+        print str(loc[1])+','+str(loc[2])
+        # break
     ### INTERSECTIONS
     # determine perimeter for intersections
     distanceAB = math.sqrt(scipy.spatial.distance.euclidean(start,end))
@@ -409,7 +412,7 @@ def spitCoords(start,end):
 
 # calculate weight for each edge
 def setedgeWeights(mapGraph,crimeLocs):
-    trackCount = []
+    trackCount = [0]
     for edge in mapGraph.edges:
         intersection1 = edge.coord1
         intersection2 = edge.coord2
@@ -439,8 +442,8 @@ def setedgeWeights(mapGraph,crimeLocs):
 
 
 def main():
-    start = (40.633204,-73.951)
-    end = (40.65057,-73.9548)
+    start = (40.647335,-73.968420)
+    end = (40.643175,-73.968584)
     spitCoords(start,end)
 
 if __name__=="__main__":
