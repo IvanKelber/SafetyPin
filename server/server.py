@@ -403,6 +403,8 @@ def spitCoords(start,end):
     for latLng in latlongs:
         print str(latLng[0])+','+str(latLng[1])
 
+    return latlongs
+
 
 
 # calculate weight for each edge
