@@ -190,7 +190,7 @@ def getArea(coord1, coord2,tradeOffVer,tradeOffHor):
 
 # get crimes in the given perimeter
 def getCrimes(area):
-    conn = sqlite3.connect('data/all_cities/crime.db')
+    conn = sqlite3.connect('../data/all_cities/crime.db')
     c = conn.cursor()
     # print area
     # print area[0][0],area[1][0],area[0][1],area[1][1]
@@ -208,7 +208,7 @@ def getCrimes(area):
 
 # get intersections in given perimeter
 def getIntersections(area):
-    conn = sqlite3.connect('server/intersection.db')
+    conn = sqlite3.connect('./intersection.db')
     c = conn.cursor()
     c.execute("SELECT REF1, REF2, LAT1, LONG1, LAT2, LONG2, LENGTH FROM EDGES WHERE (LAT1 BETWEEN "\
         +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONG1 BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "\
@@ -344,6 +344,7 @@ def setcrimeWeights(count):
 def spitCoords(start,end):
     ### CRIMES
     # determine perimeter for crimes
+    print(start,end)
     distanceAB = math.sqrt(scipy.spatial.distance.euclidean(start,end))
     tradeOffHor = 0.00025*distanceAB
     tradeOffVer = 0.000125*distanceAB
@@ -387,11 +388,18 @@ def spitCoords(start,end):
         nodesDict[edge[1]] = (edge[4],edge[5])
 
     nodes = set()
+    startMinimum = float("inf")
+    endMinimum = float("inf")
     for node in nodesDict:
         nodes.add(Node(node,nodesDict[node]))
-        if nodesDict[node] == start:
+        startDiff = scipy.spatial.distance.euclidean(nodesDict[node],start)
+        endDiff = scipy.spatial.distance.euclidean(nodesDict[node],end)
+
+        if startDiff < startMinimum:
+            startMinimum = startDiff
             startNode = Node(node,start)
-        if nodesDict[node] == end:
+        if endDiff < endMinimum:
+            endMinimum = endDiff
             endNode = Node(node,end)
     graph = Graph(nodes,edges)
 
@@ -440,7 +448,7 @@ def setedgeWeights(mapGraph,crimeLocs):
 
 def main():
     start = (40.633204,-73.951)
-    end = (40.65057,-73.9548)
+    end = (40.64010457, -73.9559158)
     spitCoords(start,end)
 
 if __name__=="__main__":

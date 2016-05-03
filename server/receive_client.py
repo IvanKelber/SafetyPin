@@ -28,19 +28,26 @@ def main():
         data = c.recv(1024)
 
         try:
+            print("Data:",data.encode('utf-8'))
             latLngs = eval(data.encode('utf-8'))
             A = latLngs[0]
             B = latLngs[1]
+
+            print("A:",type(A[0]),"B:",type(B));
         except SyntaxError:
             #input isn't successful
+            print("Unexpected Syntax")
             pass
         try:
+            print("A:",A,"B:",B);
             coords = spitCoords(A,B)
+            print(coords)
             out=repr(coords).encode('utf-8')
             c.send(out)
 
         except UnboundLocalError:
             #Input was not successful and A and B are not defined.
+            print("UnboundLocalError");
             pass
             
 
