@@ -236,8 +236,8 @@ def getArea(coord1, coord2,tradeOffVer,tradeOffHor):
 def getCrimes(area):
     conn = sqlite3.connect('data/all_cities/crime.db')
     c = conn.cursor()
-    print area
-    print area[0][0],area[1][0],area[0][1],area[1][1]
+    # print area
+    # print area[0][0],area[1][0],area[0][1],area[1][1]
     c.execute("SELECT T.LID,T.LATITUDE,T.LONGITUDE,T.OFFENSE_ID,O.TYPE FROM OFFENSE O,(SELECT L.ID LID,LATITUDE,LONGITUDE,OFFENSE_ID FROM LOCATION L,FACT F WHERE (LATITUDE BETWEEN "\
         +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "+str(max(area[0][1],area[1][1]))+\
         " AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
@@ -255,10 +255,9 @@ def getCrimes(area):
 def getIntersections(area):
     conn = sqlite3.connect('server/intersection.db')
     c = conn.cursor()
-    # print area
-    # print area[0][0],area[1][0],area[0][1],area[1][1]
-    c.execute("SELECT LATITUDE,LONGITUDE FROM NODES WHERE (LATITUDE BETWEEN "\
-        +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "\
+    c.execute("SELECT REF1, REF2, LAT1, LONG1, LAT2, LONG2, LENGTH FROM EDGES WHERE (LAT1 BETWEEN "\
+        +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONG1 BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "\
+        +str(max(area[0][1],area[1][1]))+") AND (LAT2 BETWEEN " +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONG2 BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "\
         +str(max(area[0][1],area[1][1]))+")")
     intersectionLocs = []
     for row in c:       
@@ -321,8 +320,6 @@ def getMidpoint(A, B):
 
 # dijkstra's algorithm
 def dijkstras(mapGraph,start,end):
-    print "start :",start.reference,start.coordinates
-    print "end ",end.reference,end.coordinates
     distance = {}
     path = {}
     for node in mapGraph.nodes:
@@ -333,84 +330,32 @@ def dijkstras(mapGraph,start,end):
 
     visitedNodes = []
     nodeQueue = mapGraph.nodes
-    i = 1
-    # print len(mapGraph.edges)," edges"
-    # print len(mapGraph.nodes)," nodes"
-    # for node in mapGraph.nodes:
-    #   for edge in mapGraph.edges:
-    #       print node.coordinates
-        # i += 1
-    i = 1
-    # for edge in mapGraph.edges:
-    #   print i," node 1 ",edge.node1," - node 2 ",edge.node2," weight ",edge.crimeWeight
-    #   i += 1
 
     while len(nodeQueue):
         safestNode = shortestPath(nodeQueue,distance)
         visitedNodes.append(safestNode[0].reference)
         nodeQueue.remove(safestNode[0])
 
-        # print "safestNode ",safestNode[0].reference,"distance ",distance[safestNode[0].reference]
-        for edge in mapGraph.edges:
-            # if '42437067' == edge.node1 or '42437067' == edge.node2:
-            # print edge.node1,"-",edge.node2,"weight ",edge.crimeeWeight
-            # if safestNode[0].reference == end.reference:
-            #     print "end point"
-            # print "weights ",edge.crimeWeight,"node 1 ",edge.node1," and ",edge.node2  
+        for edge in mapGraph.edges: 
             weight = distance[safestNode[0].reference] + edge.crimeWeight
+
             if safestNode[0].reference == edge.node1:
-                # print "IF visiting edge",safestNode[0].reference,"-",edge.node2,"weight ",edge.crimeWeight
-                # if edge.node1 not in visitedNodes:
                 if distance[edge.node2] > weight:
                     distance[edge.node2] = weight
                     path[edge.node2] = safestNode[0]
-                    # print "******path******",distance[edge.node2]
+
             elif safestNode[0].reference == edge.node2:
-                # print "ELIF visiting edge",safestNode[0].reference,"-",edge.node1,"weight ",edge.crimeWeight
-                # if edge.node2 not in visitedNodes:
                 if distance[edge.node1] > weight:
                     distance[edge.node1] = weight
                     path[edge.node1] = safestNode[0]
-                    # print "******path******",distance[edge.node1]
-
-    # if start.reference in path:
-    #     path.remove(start.reference)
-
-    # print distance
-    # print path
-
-    # for ref in path:
-    #     ref1 = path[ref]
-    #     if ref1 in path.keys():
-    #         if path[ref1] == ref:
-    #             print ref1,ref
-
-
-
 
     latLngs = [end.coordinates]
     temp = end.reference
 
-    # print len(path)
-
-    # # print temp,"temp"
-    # soFar = []
-    # for k,v in path.items():
-    #     print k,v.coordinates,v.reference
-
-    # while temp is not start.reference:
-    #   # print temp,start.reference,"inside"
-    #   print path[temp].coordinates
-    #   time.sleep(2)
-    #   latLngs.append(path[temp].coordinates)
-    #   temp = path[temp]
-
-    # for lat in latLngs:
-    #     print lat
-    # return latLngs.reverse()
-    # for node in path:
-    #     print node,path[node].reference,path[node].coordinates
-    # return path
+    while temp is not start.reference:
+      latLngs.append(path[temp].coordinates)
+      temp = path[temp].reference
+    return latLngs
 
 
 
@@ -440,84 +385,109 @@ def setcrimeWeights(count):
 
 
 
+def spitCoords(start,end):
+	### CRIMES
+	# determine perimeter for crimes
+	print "fetching crime perimeter"
+	distanceAB = scipy.spatial.distance.euclidean(start,end)
+	tradeOffHor = 0.25*distanceAB
+	tradeOffVer = 0.125*distanceAB
+
+	# obtain vertices of the parallelogram
+	crimeArea = getArea(start,end,tradeOffVer,tradeOffHor)
+
+	# check for larger dimension and get crimes
+	horDistance = scipy.spatial.distance.euclidean(crimeArea[0][0],crimeArea[0][1])
+	verDistance = scipy.spatial.distance.euclidean(crimeArea[1][0],crimeArea[1][1])
+	if horDistance > verDistance:
+		crimeLocs = getCrimes(crimeArea[0])
+	else:
+		crimeLocs = getCrimes(crimeArea[1])	
+	print "crime area fetched"
+
+	print "fetching intersection perimeter"
+	### INTERSECTIONS
+	# determine perimeter for intersections
+	distanceAB = scipy.spatial.distance.euclidean(start,end)
+	tradeOffHor = 0.25*distanceAB
+	tradeOffVer = 0.125*distanceAB
+
+	# obtain vertices of the parallelogram
+	intersectionArea = getArea(start,end,tradeOffVer,tradeOffHor)
+
+	# check for larger dimension and get Intersections
+	horDistance = scipy.spatial.distance.euclidean(intersectionArea[0][0],intersectionArea[0][1])
+	verDistance = scipy.spatial.distance.euclidean(intersectionArea[1][0],intersectionArea[1][1])
+	if horDistance > verDistance:
+		intersectionLocs = getIntersections(intersectionArea[0])
+	else:
+		intersectionLocs = getIntersections(intersectionArea[1])
+
+	# make graphs from the db
+	edges = set()
+	for edge in intersectionLocs:
+		edges.add(Edge(edge[0],(edge[2],edge[3]),edge[1],(edge[4],edge[5]),edge[6]))
+
+	nodesDict = {}
+	for edge in intersectionLocs:
+		nodesDict[edge[0]] = (edge[2],edge[3])
+		nodesDict[edge[1]] = (edge[4],edge[5])
+
+	nodes = set()
+	for node in nodesDict:
+		nodes.add(Node(node,nodesDict[node]))
+		if nodesDict[node] == start:
+			startNode = Node(node,start)
+		if nodesDict[node] == end:
+			endNode = Node(node,end)
+	graph = Graph(nodes,edges)
+	print "graph created"
+	# weight edges based on crimes
+	print "starting to weight"
+	weightedGraph = setedgeWeights(graph,crimeLocs)
+	print "weighting complete"
+	# for node in graph.nodes:
+	# 	print str(node.coordinates[0])+','+str(node.coordinates[1])
+
+	# obtain intersections on the way
+	latlongs = dijkstras(graph,startNode,endNode)
+	for latLng in latlongs:
+		print str(latLng[0])+','+str(latLng[1])
+
+
+
+
 # calculate weight for each edge
-def setedgeWeight(intersection1,intersection2,crimeLocs):
+def setedgeWeights(mapGraph,crimeLocs):
+	for edge in mapGraph.edges:
+		intersection1 = edge.coord1
+		intersection2 = edge.coord2
+		distance = scipy.spatial.distance.euclidean(intersection1,intersection2)
+		print distance
+		# calculate region around the edge
+		tradeOffVer = 0.25*distance
+		tradeOffHor = 0*distance
+		area = getArea(intersection1,intersection2,tradeOffVer,tradeOffHor)
+		for loc in crimeLocs:
+			# check for larger dimension and get crimes
+			horDistance = scipy.spatial.distance.euclidean(area[0][0],area[0][1])
+			verDistance = scipy.spatial.distance.euclidean(area[1][0],area[1][1])
+			if horDistance > verDistance:
+				reqLocs = getCrimes(area[0])
+			else:
+				reqLocs = getCrimes(area[1])
 
-    # calculate region around the edge
-    tradeOffVer = 0
-    tradeOffHor = 0
-    area = getArea(intersection1,intersection2,tradeOffVer,tradeOffHor)
-    weight = 0
-
-    for loc in crimeLocs:
-        # accept crime if inside the boundary
-        
-        # weight crime based on severity and frequency 
-        # weight = 
-        pass
-
-
-
-
-    
-
-                
-
+		edge.crimeWeight = len(reqLocs)
+		print edge.crimeWeight
+	return graph
 
 
 
 
 def main():
-    # extract_intersections('../../test.osm')
-    
-    # pass two coordinates and the tradeoffs
-    # area = getArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028),0.00003,0.003)
-    # horDistance = scipy.spatial.distance.euclidean(area[0][0],area[0][1])
-    # verDistance = scipy.spatial.distance.euclidean(area[1][0],area[1][1])
-    # if horDistance > verDistance:
-    # 	crimeLocs = getCrimes(area[0])
-    # else:
-    # 	crimeLocs = getCrimes(area[1])
-    # # crimeTypes = {}
-    
-    # print len(crimeLocs)
-    # for loc in crimeLocs:
-    # 	if not drawParallelogram(area,(loc[1],loc[2])):
-    # 		crimeLocs.remove(loc)
-    # print len(crimeLocs)
-    # for loc in crimeLocs:
-    # 	print str(loc[1])+","+str(loc[2])
-
-    area = getArea((40.6521768650001,-73.961050676),(40.6330714710001,-73.94972028),0.00003,0.0)
-    horDistance = scipy.spatial.distance.euclidean(area[0][0],area[0][1])
-    verDistance = scipy.spatial.distance.euclidean(area[1][0],area[1][1])
-    if horDistance > verDistance:
-    	crimeLocs = getIntersections(area[0])
-    else:
-    	crimeLocs = getIntersections(area[1])
-    # crimeTypes = {}
-    
-    print len(crimeLocs)
-    for loc in crimeLocs:
-    	if not drawParallelogram(area,(loc[0],loc[1])):
-    		crimeLocs.remove(loc)
-    print len(crimeLocs)
-    for loc in crimeLocs:
-    	print str(loc[0])+","+str(loc[1])
-    	# print str(loc[3])+" "+str(loc[4]) 
-    #     if str(loc[3])+" "+str(loc[4]) not in crimeTypes:
-    #         crimeTypes[str(loc[3])+" "+str(loc[4])] = 1
-    #         continue
-    #     crimeTypes[str(loc[3])+" "+str(loc[4])] += 1
-
-    # print crimeTypes
-
-    # nodes= [Node(1,(1,1)),Node(2,(2,2)),Node(3,(3,3)),Node(4,(4,4)),Node(5,(5,5)),Node(6,(6,6))]
-    # edges = [Edge(Node(1,(1,1)),Node(2,(2,2)),2),Edge(Node(1,(1,1)),Node(5,(5,5)),5),Edge(Node(2,(2,2)),Node(3,(3,3)),8),Edge(Node(2,(2,2)),Node(4,(4,4)),1),Edge(Node(4,(4,4)),Node(5,(5,5)),1),Edge(Node(3,(3,3)),Node(4,(4,4)),3),Edge(Node(3,(3,3)),Node(6,(6,6)),10),Edge(Node(4,(4,4)),Node(6,(6,6)),2)]
-    # graph = Graph(nodes,edges)
-    # # # print "1"
-    # print dijkstras(graph,Node(1,(1,1)),Node(6,(6,6)))
-    # print "2"
+    start = (40.633204,-73.951)
+    end = (40.65057,-73.9548)
+    spitCoords(start,end)
 
 if __name__=="__main__":
     main()
