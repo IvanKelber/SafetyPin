@@ -386,100 +386,99 @@ def setcrimeWeights(count):
 
 
 def spitCoords(start,end):
-	### CRIMES
-	# determine perimeter for crimes
-	print "fetching crime perimeter"
-	distanceAB = scipy.spatial.distance.euclidean(start,end)
-	tradeOffHor = 0.25*distanceAB
-	tradeOffVer = 0.125*distanceAB
+    ### CRIMES
+    # determine perimeter for crimes
+    print "fetching crime perimeter"
+    distanceAB = scipy.spatial.distance.euclidean(start,end)
+    tradeOffHor = 0.25*distanceAB
+    tradeOffVer = 0.125*distanceAB
 
-	# obtain vertices of the parallelogram
-	crimeArea = getArea(start,end,tradeOffVer,tradeOffHor)
+    # obtain vertices of the parallelogram
+    crimeArea = getArea(start,end,tradeOffVer,tradeOffHor)
 
-	# check for larger dimension and get crimes
-	horDistance = scipy.spatial.distance.euclidean(crimeArea[0][0],crimeArea[0][1])
-	verDistance = scipy.spatial.distance.euclidean(crimeArea[1][0],crimeArea[1][1])
-	if horDistance > verDistance:
-		crimeLocs = getCrimes(crimeArea[0])
-	else:
-		crimeLocs = getCrimes(crimeArea[1])	
-	print "crime area fetched"
+    # check for larger dimension and get crimes
+    horDistance = scipy.spatial.distance.euclidean(crimeArea[0][0],crimeArea[0][1])
+    verDistance = scipy.spatial.distance.euclidean(crimeArea[1][0],crimeArea[1][1])
+    if horDistance > verDistance:
+        crimeLocs = getCrimes(crimeArea[0])
+    else:
+        crimeLocs = getCrimes(crimeArea[1]) 
+    print "crime area fetched"
 
-	print "fetching intersection perimeter"
-	### INTERSECTIONS
-	# determine perimeter for intersections
-	distanceAB = scipy.spatial.distance.euclidean(start,end)
-	tradeOffHor = 0.25*distanceAB
-	tradeOffVer = 0.125*distanceAB
+    print "fetching intersection perimeter"
+    ### INTERSECTIONS
+    # determine perimeter for intersections
+    distanceAB = scipy.spatial.distance.euclidean(start,end)
+    tradeOffHor = 0.25*distanceAB
+    tradeOffVer = 0.125*distanceAB
 
-	# obtain vertices of the parallelogram
-	intersectionArea = getArea(start,end,tradeOffVer,tradeOffHor)
+    # obtain vertices of the parallelogram
+    intersectionArea = getArea(start,end,tradeOffVer,tradeOffHor)
 
-	# check for larger dimension and get Intersections
-	horDistance = scipy.spatial.distance.euclidean(intersectionArea[0][0],intersectionArea[0][1])
-	verDistance = scipy.spatial.distance.euclidean(intersectionArea[1][0],intersectionArea[1][1])
-	if horDistance > verDistance:
-		intersectionLocs = getIntersections(intersectionArea[0])
-	else:
-		intersectionLocs = getIntersections(intersectionArea[1])
+    # check for larger dimension and get Intersections
+    horDistance = scipy.spatial.distance.euclidean(intersectionArea[0][0],intersectionArea[0][1])
+    verDistance = scipy.spatial.distance.euclidean(intersectionArea[1][0],intersectionArea[1][1])
+    if horDistance > verDistance:
+        intersectionLocs = getIntersections(intersectionArea[0])
+    else:
+        intersectionLocs = getIntersections(intersectionArea[1])
 
-	# make graphs from the db
-	edges = set()
-	for edge in intersectionLocs:
-		edges.add(Edge(edge[0],(edge[2],edge[3]),edge[1],(edge[4],edge[5]),edge[6]))
+    # make graphs from the db
+    edges = set()
+    for edge in intersectionLocs:
+        edges.add(Edge(edge[0],(edge[2],edge[3]),edge[1],(edge[4],edge[5]),edge[6]))
 
-	nodesDict = {}
-	for edge in intersectionLocs:
-		nodesDict[edge[0]] = (edge[2],edge[3])
-		nodesDict[edge[1]] = (edge[4],edge[5])
+    nodesDict = {}
+    for edge in intersectionLocs:
+        nodesDict[edge[0]] = (edge[2],edge[3])
+        nodesDict[edge[1]] = (edge[4],edge[5])
 
-	nodes = set()
-	for node in nodesDict:
-		nodes.add(Node(node,nodesDict[node]))
-		if nodesDict[node] == start:
-			startNode = Node(node,start)
-		if nodesDict[node] == end:
-			endNode = Node(node,end)
-	graph = Graph(nodes,edges)
-	print "graph created"
-	# weight edges based on crimes
-	print "starting to weight"
-	weightedGraph = setedgeWeights(graph,crimeLocs)
-	print "weighting complete"
-	# for node in graph.nodes:
-	# 	print str(node.coordinates[0])+','+str(node.coordinates[1])
+    nodes = set()
+    for node in nodesDict:
+        nodes.add(Node(node,nodesDict[node]))
+        if nodesDict[node] == start:
+            startNode = Node(node,start)
+        if nodesDict[node] == end:
+            endNode = Node(node,end)
+    graph = Graph(nodes,edges)
+    print "graph created"
+    # weight edges based on crimes
+    print "starting to weight"
+    weightedGraph = setedgeWeights(graph,crimeLocs)
+    print "weighting complete"
+    # for node in graph.nodes:
+    #   print str(node.coordinates[0])+','+str(node.coordinates[1])
 
-	# obtain intersections on the way
-	latlongs = dijkstras(graph,startNode,endNode)
-	for latLng in latlongs:
-		print str(latLng[0])+','+str(latLng[1])
+    # obtain intersections on the way
+    latlongs = dijkstras(graph,startNode,endNode)
+    for latLng in latlongs:
+        print str(latLng[0])+','+str(latLng[1])
 
 
 
 
 # calculate weight for each edge
 def setedgeWeights(mapGraph,crimeLocs):
-	for edge in mapGraph.edges:
-		intersection1 = edge.coord1
-		intersection2 = edge.coord2
-		distance = scipy.spatial.distance.euclidean(intersection1,intersection2)
-		print distance
-		# calculate region around the edge
-		tradeOffVer = 0.25*distance
-		tradeOffHor = 0*distance
-		area = getArea(intersection1,intersection2,tradeOffVer,tradeOffHor)
-		for loc in crimeLocs:
-			# check for larger dimension and get crimes
-			horDistance = scipy.spatial.distance.euclidean(area[0][0],area[0][1])
-			verDistance = scipy.spatial.distance.euclidean(area[1][0],area[1][1])
-			if horDistance > verDistance:
-				reqLocs = getCrimes(area[0])
-			else:
-				reqLocs = getCrimes(area[1])
+    for edge in mapGraph.edges:
+        intersection1 = edge.coord1
+        intersection2 = edge.coord2
+        distance = scipy.spatial.distance.euclidean(intersection1,intersection2)
+        print distance,"street length"
+        # calculate region around the edge
+        tradeOffVer = 0.25*distance
+        tradeOffHor = 0*distance
+        area = getArea(intersection1,intersection2,tradeOffVer,tradeOffHor)
+        count = 0
+        for loc in crimeLocs:
+            if drawParallelogram(area,loc):
+                count += 1
+            # check for larger dimension and get crimes
 
-		edge.crimeWeight = len(reqLocs)
-		print edge.crimeWeight
-	return graph
+
+        edge.crimeWeight = count
+        print count
+        # print edge.crimeWeight
+    # return graph
 
 
 
