@@ -26,11 +26,24 @@ def main():
         c, addr = s.accept()
         print("Got connection from", addr)
         data = c.recv(1024)
-        latLngs = data.encode('utf-8')
 
-        print(latLngs)
+        try:
+            latLngs = eval(data.encode('utf-8'))
+            A = latLngs[0]
+            B = latLngs[1]
+        except SyntaxError:
+            #input isn't successful
+            pass
+        try:
+            coords = spitCoords(A,B)
+            out=repr(coords).encode('utf-8')
+            c.send(out)
 
-        c.send("40,-73".encode('utf-8'))
+        except UnboundLocalError:
+            #Input was not successful and A and B are not defined.
+            pass
+            
+
         c.close()
 
 
