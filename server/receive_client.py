@@ -6,7 +6,7 @@ from server import *
 
 def main():
     s = socket.socket()
-    host = os.gethostname()
+    host = socket.gethostbyname(socket.gethostname())
 
     api = osmapi.OsmApi()
     while True:
@@ -18,19 +18,19 @@ def main():
             print("Port %d already in use" % port)
             continue
 
+    print("Listening on %s:%s" % (host,port))
     s.listen(5)
 
 
     while True:
-         c, addr = s.accept()
+        c, addr = s.accept()
         print("Got connection from", addr)
         data = c.recv(1024)
-        latLngs = eval(data.encode('utf-8'))
-        xml = getOSM(api,latLngs(0),latLngs(1))
-        path = (xml)
+        latLngs = data.encode('utf-8')
 
+        print(latLngs)
 
-        c.send("I come in peace.".encode('utf-8'))
+        c.send("40,-73".encode('utf-8'))
         c.close()
 
 
