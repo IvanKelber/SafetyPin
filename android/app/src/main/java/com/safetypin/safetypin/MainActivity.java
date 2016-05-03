@@ -29,9 +29,9 @@ public class MainActivity extends ActionBarActivity {
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    String[] addressInfo = addr.getText().toString().split(":");
-                    MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),response,"I come in peace.");
-                    mct.execute();
+//                    String[] addressInfo = addr.getText().toString().split(":");
+//                    MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),response,"I come in peace.");
+//                    mct.execute();
                     handled = true;
                 }
                 return handled;
@@ -42,6 +42,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this,MapsActivity.class);
+                i.putExtra("address",addr.getText().toString());
                 startActivity(i);
             }
         });

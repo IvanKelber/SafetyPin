@@ -1,6 +1,7 @@
 package com.safetypin.safetypin;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -35,11 +36,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MarkerCache<Marker> userLocation = new MarkerCache<Marker>(1);
     private MarkerCache<Marker> userDestination= new MarkerCache<Marker>(1);
     private TextView tv;
+    private String serverAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        Intent i = getIntent();
+        serverAddress = i.getStringExtra("address");
         tv = (TextView) findViewById(R.id.json_view);
         tv.setVisibility(View.GONE);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -112,6 +116,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             updateCamera(m,userLocation.getFirst());
             DirectionsFetcher df = new DirectionsFetcher(mMap,userLocation.getFirst().getPosition(),destination,tv);
             df.execute();
+            String[] addressInfo = serverAddress.split(":");
+            MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),mMap,"I come in peace.");
+            mct.execute();
         } else {
             CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
         }
