@@ -184,6 +184,7 @@ def getArea(coord1, coord2,tradeOffVer,tradeOffHor):
 
     horCoords = [(xcoords[0],xcoords[0]*slope+intercept),(xcoords[1],xcoords[1]*slope+intercept)]
     # print "getArea" ,[horCoords,verCoords]
+    # print [horCoords,verCoords]
     return [horCoords,verCoords]
 
 
@@ -277,15 +278,20 @@ def getMidpoint(A, B):
 def dijkstras(mapGraph,start,end):
     distance = {}
     path = {}
+    count = 0
     for node in mapGraph.nodes:
+        count += 1
+
         if node.reference != start.reference:
             distance[node.reference] = float("inf")
             continue
         distance[start.reference] = 0
 
+    print("NUMBER OF NODES COUNTED:",count)
     visitedNodes = []
     nodeQueue = mapGraph.nodes
-
+    print("LENGTH OF MAP:",len(mapGraph.nodes),len(mapGraph.edges))
+    count = 0
     while len(nodeQueue):
         safestNode = shortestPath(nodeQueue,distance)
         visitedNodes.append(safestNode[0].reference)
@@ -295,21 +301,32 @@ def dijkstras(mapGraph,start,end):
             weight = distance[safestNode[0].reference] + edge.crimeWeight
 
             if safestNode[0].reference == edge.node1:
+                count += 1
+                # print("BEFORE FIRST IF STATEMENT:",distance[edge.node1],weight)
+
                 if distance[edge.node2] > weight:
                     distance[edge.node2] = weight
                     path[edge.node2] = safestNode[0]
+                    # print("AFTER FIRST IF STATEMENT",edge.node1,weight)
+
 
             elif safestNode[0].reference == edge.node2:
+                count += 1
+                # print("BEFORE SECOND IF STATEMENT:",distance[edge.node1],weight)
                 if distance[edge.node1] > weight:
                     distance[edge.node1] = weight
                     path[edge.node1] = safestNode[0]
+                    # print("AFTER SECOND IF STATEMENT",edge.node1,weight)
+
+    # print("COUNT:",count)
 
     latLngs = [end.coordinates]
     temp = end.reference
 
     while temp is not start.reference:
-      latLngs.append(path[temp].coordinates)
-      temp = path[temp].reference
+        latLngs.append(path[temp].coordinates)
+        temp = path[temp].reference
+
     return latLngs
 
 
@@ -344,49 +361,64 @@ def setcrimeWeights(count):
 def spitCoords(start,end):
     ### CRIMES
     # determine perimeter for crimes
-    print(start,end)
+    # print(start,end)
     distanceAB = math.sqrt(scipy.spatial.distance.euclidean(start,end))
     tradeOffHor = 0.00025*distanceAB
     tradeOffVer = 0.000125*distanceAB
 
     # obtain vertices of the parallelogram
+    start_time = time.clock()
     crimeArea = getArea(start,end,tradeOffVer,tradeOffHor)
+    print ("Calculating crime area took:",time.clock() - start_time, "seconds.")
 
     # check for larger dimension and get crimes
+    start_time = time.clock()
     horDistance = scipy.spatial.distance.euclidean(crimeArea[0][0],crimeArea[0][1])
     verDistance = scipy.spatial.distance.euclidean(crimeArea[1][0],crimeArea[1][1])
     if horDistance > verDistance:
         crimeLocs = getCrimes(crimeArea[0])
     else:
         crimeLocs = getCrimes(crimeArea[1]) 
+    print ("Getting crimes took:",time.clock() - start_time, "seconds.")
+
 
     ### INTERSECTIONS
     # determine perimeter for intersections
     distanceAB = math.sqrt(scipy.spatial.distance.euclidean(start,end))
-    tradeOffHor = 0.00025*distanceAB
-    tradeOffVer = 0.000125*distanceAB
+    tradeOffHor = 0.0025*distanceAB
+    tradeOffVer = 0.0025*distanceAB
 
     # obtain vertices of the parallelogram
+    start_time = time.clock()
     intersectionArea = getArea(start,end,tradeOffVer,tradeOffHor)
+    print ("Calculating intersection area took:",time.clock() - start_time, "seconds.")
 
     # check for larger dimension and get Intersections
+    start_time = time.clock()
     horDistance = scipy.spatial.distance.euclidean(intersectionArea[0][0],intersectionArea[0][1])
     verDistance = scipy.spatial.distance.euclidean(intersectionArea[1][0],intersectionArea[1][1])
     if horDistance > verDistance:
         intersectionLocs = getIntersections(intersectionArea[0])
     else:
         intersectionLocs = getIntersections(intersectionArea[1])
+    print ("Getting intersections took:",time.clock() - start_time, "seconds.")
+
 
     # make graphs from the db
+    start_time = time.clock()
     edges = set()
     for edge in intersectionLocs:
         edges.add(Edge(edge[0],(edge[2],edge[3]),edge[1],(edge[4],edge[5]),edge[6]))
+    print ("Creating edges took:",time.clock() - start_time, "seconds.")
 
+    start_time = time.clock()
     nodesDict = {}
     for edge in intersectionLocs:
         nodesDict[edge[0]] = (edge[2],edge[3])
         nodesDict[edge[1]] = (edge[4],edge[5])
+    print ("Creating nodes dict took:",time.clock() - start_time, "seconds.")
 
+    start_time= time.clock()
     nodes = set()
     startMinimum = float("inf")
     endMinimum = float("inf")
@@ -398,18 +430,30 @@ def spitCoords(start,end):
         if startDiff < startMinimum:
             startMinimum = startDiff
             startNode = Node(node,start)
-        if endDiff < endMinimum:
+        elif endDiff < endMinimum:
             endMinimum = endDiff
             endNode = Node(node,end)
+    print ("Creating nodes took:",time.clock() - start_time, "seconds.")
+
     graph = Graph(nodes,edges)
 
     # weight edges based on crimes
+    start_time= time.clock()
     weightedGraph = setedgeWeights(graph,crimeLocs)
+    print ("Weighting edges took:",time.clock() - start_time, "seconds.")
+
 
     # obtain intersections on the way
+    start_time= time.clock()
     latlongs = dijkstras(graph,startNode,endNode)
-    for latLng in latlongs:
-        print str(latLng[0])+','+str(latLng[1])
+    print ("Dijkstras took:",time.clock() - start_time, "seconds.")
+
+    # for latLng in latlongs:
+    #     print str(latLng[0])+','+str(latLng[1])
+
+    start_time= time.clock()
+    latlongs.reverse()
+    print ("Reversing waypoints:",time.clock() - start_time, "seconds.")
 
     return latlongs
 
@@ -438,9 +482,16 @@ def setedgeWeights(mapGraph,crimeLocs):
     maxWeight = max(trackCount)
     minWeight = min(trackCount)
 
-    for edge in mapGraph.edges:
-        edge.crimeWeight = (((edge.crimeWeight - minWeight) / float(maxWeight - minWeight)) * (4)) + 1
+    NEW_MAX = 3
+    NEW_MIN = 1
 
+    for edge in mapGraph.edges:
+        try:
+            edge.crimeWeight = (((edge.crimeWeight - minWeight) / float(maxWeight - minWeight))
+             *(NEW_MAX-NEW_MIN)) + 1
+            # print(maxWeight,minWeight,edge.crimeWeight)
+        except ZeroDivisionError:
+            continue
     return mapGraph
 
 

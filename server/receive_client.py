@@ -11,7 +11,7 @@ def main():
     api = osmapi.OsmApi()
     while True:
         try:
-            port = int(input("Enter the port"))
+            port = int(input("Enter the port: "))
             s.bind((host,port))
             break;
         except IOError:
@@ -28,7 +28,7 @@ def main():
         data = c.recv(1024)
 
         try:
-            print("Data:",data.encode('utf-8'))
+            # print("Data:",data.encode('utf-8'))
             latLngs = eval(data.encode('utf-8'))
             A = latLngs[0]
             B = latLngs[1]
@@ -39,9 +39,9 @@ def main():
             print("Unexpected Syntax")
             pass
         try:
-            print("A:",A,"B:",B);
+            # print("A:",A,"B:",B);
             coords = spitCoords(A,B)
-            print(coords)
+            # print("outputted Coords:",coords)
             out=repr(coords).encode('utf-8')
             c.send(out)
 
