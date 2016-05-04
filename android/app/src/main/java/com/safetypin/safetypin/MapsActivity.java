@@ -2,8 +2,6 @@ package com.safetypin.safetypin;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -27,8 +25,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, PlaceSelectionListener, GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
@@ -37,6 +33,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MarkerCache<Marker> userDestination= new MarkerCache<Marker>(1);
     private TextView tv;
     private String serverAddress;
+    private MarkerCache<Marker> currentMarkers = new MarkerCache<Marker>(2);
+    private LatLng startLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +42,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         Intent i = getIntent();
         serverAddress = i.getStringExtra("address");
+        startLocation = new LatLng(40.633204,-73.951);
+
         tv = (TextView) findViewById(R.id.json_view);
         tv.setVisibility(View.GONE);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -59,43 +59,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMyLocationEnabled(true);
+//        mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(this);
+        userLocation.add(mMap.addMarker(new MarkerOptions().position(startLocation).title("StartLocation")));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 14.5f));
 
-        LocationListener locationListener = new LocationListener() {
-        final ArrayList<Marker> previous = new ArrayList<>();
-            @Override
-            public void onLocationChanged(Location location) {
-//                Toast.makeText(getApplicationContext(), "" + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-                LatLng newLocation = new LatLng(location.getLatitude(), location.getLongitude());
+//        LocationListener locationListener = new LocationListener() {
+//        final ArrayList<Marker> previous = new ArrayList<>();
+//            @Override
+//            public void onLocationChanged(Location location) {
+////                Toast.makeText(getApplicationContext(), "" + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+//                LatLng newLocation = new LatLng(location.getLatitude(), location.getLongitude());
+//
+//                Marker m = mMap.addMarker(new MarkerOptions().position(newLocation).title("Current Location").visible(false));
+//                userLocation.add(m);
+//                if(userDestination.size() == 1) {
+////                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(m.getPosition(), userDestination.getFirst().getPosition()), 13.5f));
+////                    updateCamera(m,userDestination.getFirst());
+//                } else {
+//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 14.5f));
+//                }
+//            }
+//
+//            @Override
+//            public void onStatusChanged(String s, int i, Bundle bundle) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderEnabled(String s) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderDisabled(String s) {
+//
+//            }
+//        };
 
-                Marker m = mMap.addMarker(new MarkerOptions().position(newLocation).title("Current Location").visible(false));
-                userLocation.add(m);
-                if(userDestination.size() == 1) {
-//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(m.getPosition(), userDestination.getFirst().getPosition()), 13.5f));
-//                    updateCamera(m,userDestination.getFirst());
-                } else {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newLocation, 14.5f));
-                }
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
 ////        Add a marker in Sydney, Australia, and move the camera.
 //        LatLng sydney = new LatLng(-34, 151);
@@ -114,10 +116,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (userLocation.size() == 1) {
 //            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
             updateCamera(m,userLocation.getFirst());
-            DirectionsFetcher df = new DirectionsFetcher(mMap,userLocation.getFirst().getPosition(),destination,tv);
-            df.execute();
+//            DirectionsFetcher df = new DirectionsFetcher(mMap,userLocation.getFirst().getPosition(),destination,tv);
+//            df.execute();
+//            currentMarkers.add(m);
+//            currentMarkers.add(userLocation.getFirst());
+//            String[] addressInfo = serverAddress.split(":");
+//            MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),mMap,"I come in peace.");
+//            mct.execute();
             String[] addressInfo = serverAddress.split(":");
-            MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),mMap,"I come in peace.");
+            MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),
+                    mMap,userLocation.getFirst().getPosition(),destination);
             mct.execute();
         } else {
             CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
@@ -138,11 +146,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
         userDestination.add(m);
         if (userLocation.size() == 1) {
-//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
             updateCamera(m,userLocation.getFirst());
-            DirectionsFetcher df = new DirectionsFetcher(mMap,userLocation.getFirst().getPosition(),destination,tv);
-            df.execute();
-//            tv.setVisibility(View.VISIBLE);
+            String[] addressInfo = serverAddress.split(":");
+            MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),
+                    mMap,userLocation.getFirst().getPosition(),destination);
+            mct.execute();
         } else {
             CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
         }

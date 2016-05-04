@@ -3,7 +3,6 @@ package com.safetypin.safetypin;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -33,13 +32,15 @@ public class DirectionsFetcher extends AsyncTask<Void, Integer, String> {
     private GoogleMap mMap;
     private LatLng source;
     private LatLng destination;
-    private TextView tv;
+    private ArrayList<LatLng> waypoints;
+//    private TextView tv;
 
-    public DirectionsFetcher(GoogleMap mMap,LatLng source, LatLng destination,TextView tv) {
+    public DirectionsFetcher(GoogleMap mMap,LatLng source, LatLng destination,ArrayList<LatLng> waypoints) {
         this.mMap = mMap;
         this.source = source;
         this.destination = destination;
-        this.tv = tv;
+        this.waypoints = waypoints;
+//        this.tv = tv;
     }
 
     protected String doInBackground(Void... voids) {
