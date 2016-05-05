@@ -414,6 +414,8 @@ def spitCoords(start,end):
     edges = set()
     for edge in intersectionLocs:
         e = Edge(edge[0],(edge[2],edge[3]),edge[1],(edge[4],edge[5]),edge[6])
+        setEdgeWeight(e)
+        print ("INFO:",e.coord1,e.coord2,e.crimeWeight)
         edges.add(e)
     print ("Creating edges took:",time.clock() - start_time, "seconds.")
 
@@ -445,7 +447,7 @@ def spitCoords(start,end):
 
     # weight edges based on crimes
     start_time= time.clock()
-    weightedGraph = setedgeWeights(graph,crimeLocs)
+    # weightedGraph = setedgeWeights(graph,crimeLocs)
     print ("Weighting edges took:",time.clock() - start_time, "seconds.")
 
 
