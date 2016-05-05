@@ -16,14 +16,14 @@ def main():
     c = conn.cursor()
 
 
-    if c.execute("\
-        SELECT name from sqlite_master \
-        WHERE type='table' \
-        AND name='coords'").fetchone() is None:
-        c.execute("CREATE TABLE nodes \
-            (ref INT PRIMARY KEY, latitude REAL, longitude REAL)")
-        c.execute("CREATE TABLE edges \
-            (ref1 INT, ref2 INT, lat1 REAL, long1 REAL, lat2 REAL, long2 REAL,length REAL, PRIMARY KEY(ref1,ref2))")
+    # if c.execute("\
+    #     SELECT name from sqlite_master \
+    #     WHERE type='table' \
+    #     AND name='coords'").fetchone() is None:
+    #     c.execute("CREATE TABLE nodes \
+    #         (ref INT PRIMARY KEY, latitude REAL, longitude REAL)")
+    #     c.execute("CREATE TABLE edges \
+    #         (ref1 INT, ref2 INT, lat1 REAL, long1 REAL, lat2 REAL, long2 REAL,length REAL, PRIMARY KEY(ref1,ref2))")
 
     print "Storing intersections as nodes..."
     for intersection,coordinates in intersections.items():
