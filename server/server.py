@@ -15,6 +15,8 @@ try:
 except ImportError, e:
     from xml.etree import ElementTree as ET
 
+# CITY_BOUNDS = {"BOSTON":,"NEWYORK":,"CHICAGO":,"PHILADELPHIA",:"DENVER":}
+
 def extract_intersections(osm, verbose=True):
     # This function takes an osm file as an input. It then goes through each xml 
     # element and searches for nodes that are shared by two or more ways.
@@ -411,7 +413,8 @@ def spitCoords(start,end):
     start_time = time.clock()
     edges = set()
     for edge in intersectionLocs:
-        edges.add(Edge(edge[0],(edge[2],edge[3]),edge[1],(edge[4],edge[5]),edge[6]))
+        e = Edge(edge[0],(edge[2],edge[3]),edge[1],(edge[4],edge[5]),edge[6])
+        edges.add(e)
     print ("Creating edges took:",time.clock() - start_time, "seconds.")
 
     start_time = time.clock()
@@ -461,6 +464,25 @@ def spitCoords(start,end):
     return latlongs
 
 
+def setEdgeWeight(edge):
+    node1 = edge.coord1
+    node2 = edge.coord2
+    radius = scipy.spatial.distance.euclidean(node1,node2)/2
+    midpoint = getMidpoint(node1,node2)
+    conn = sqlite3.connect('../data/all_cities/crime.db')
+    c = conn.cursor()
+    # print area
+    # print area[0][0],area[1][0],area[0][1],area[1][1]
+    query = "SELECT * FROM FACT f\
+    JOIN LOCATION L ON f.location_id = l.id \
+    where \
+    ("+str(midpoint[0]) +" - l.latitude)*("+str(midpoint[0])+" - l.latitude) + \
+    ("+str(midpoint[1])+" - l.longitude)*("+str(midpoint[1])+" - l.longitude) < "+ str(radius * radius)+";"
+    # c.execute("SELECT T.LID,T.LATITUDE,T.LONGITUDE,T.OFFENSE_ID,O.TYPE FROM OFFENSE O,(SELECT L.ID LID,LATITUDE,LONGITUDE,OFFENSE_ID FROM LOCATION L,FACT F WHERE (LATITUDE BETWEEN "\
+    #     +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "+str(max(area[0][1],area[1][1]))+\
+    #     " AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
+    c.execute(query)
+    edge.crimeWeight = len(c.fetchall()) + 1
 
 # calculate weight for each edge
 def setedgeWeights(mapGraph,crimeLocs):
@@ -474,7 +496,7 @@ def setedgeWeights(mapGraph,crimeLocs):
         if intersection1[0] == intersection2[0]:
             continue        
         
-        count = 1
+        count = 0
         for loc in crimeLocs:
             locDistance = math.sqrt(scipy.spatial.distance.euclidean(center,(loc[1],loc[2])))
             if locDistance <= distance:
@@ -492,7 +514,7 @@ def setedgeWeights(mapGraph,crimeLocs):
         try:
             edge.crimeWeight = (((edge.crimeWeight - minWeight) / float(maxWeight - minWeight))
              *(NEW_MAX-NEW_MIN)) + 1
-            # print(maxWeight,minWeight,edge.crimeWeight)
+            print(edge.coord1,edge.coord2,edge.crimeWeight)
         except ZeroDivisionError:
             continue
     return mapGraph
@@ -501,13 +523,11 @@ def setedgeWeights(mapGraph,crimeLocs):
 
 
 def main():
-<<<<<<< HEAD
     start = (40.647335,-73.968420)
     end = (40.643175,-73.968584)
-=======
-    start = (40.633204,-73.951)
-    end = (40.64010457, -73.9559158)
->>>>>>> 9ab3491d055e5af37855a19bcc6459be5f63a441
+
+    # start = (40.633204,-73.951)
+    # end = (40.64010457, -73.9559158)
     spitCoords(start,end)
 
 if __name__=="__main__":
