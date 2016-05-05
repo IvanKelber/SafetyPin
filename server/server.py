@@ -501,14 +501,15 @@ def setedgeWeights(mapGraph,crimeLocs):
 
 
 def main():
-<<<<<<< HEAD
-    start = (40.647335,-73.968420)
-    end = (40.643175,-73.968584)
-=======
-    start = (40.633204,-73.951)
-    end = (40.64010457, -73.9559158)
->>>>>>> 9ab3491d055e5af37855a19bcc6459be5f63a441
-    spitCoords(start,end)
+    pass
+# <<<<<<< HEAD
+#     start = (40.647335,-73.968420)
+#     end = (40.643175,-73.968584)
+# =======
+#     start = (40.633204,-73.951)
+#     end = (40.64010457, -73.9559158)
+# >>>>>>> 9ab3491d055e5af37855a19bcc6459be5f63a441
+#     spitCoords(start,end)
 
 if __name__=="__main__":
     main()
