@@ -420,6 +420,7 @@ def spitCoords(start,end):
     print ("Creating edges took:",time.clock() - start_time, "seconds.")
 
     start_time = time.clock()
+    print "Length of Intersections",len(intersectionLocs)
     nodesDict = {}
     for edge in intersectionLocs:
         nodesDict[edge[0]] = (edge[2],edge[3])
@@ -428,13 +429,14 @@ def spitCoords(start,end):
 
     start_time= time.clock()
     nodes = set()
+    print "LENGHT OF NODESDICT",len(nodesDict)
     startMinimum = float("inf")
     endMinimum = float("inf")
     for node in nodesDict:
         nodes.add(Node(node,nodesDict[node]))
         startDiff = scipy.spatial.distance.euclidean(nodesDict[node],start)
         endDiff = scipy.spatial.distance.euclidean(nodesDict[node],end)
-
+        print "startDiff,endDiff",startDiff,endDiff
         if startDiff < startMinimum:
             startMinimum = startDiff
             startNode = Node(node,start)
