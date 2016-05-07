@@ -1,6 +1,8 @@
 import sqlite3
 import numpy as np
 from sklearn.preprocessing import scale
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn import cross_validation
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 
@@ -46,7 +48,9 @@ def classify(crimes): # crimes should be list of tuples (city_id, offense_id, la
     # Transpose back...
     X_train = np.transpose(X_train)
     label_train = np.transpose(label_train)
-    
+    X_test = np.transpose(X_test)
+    label_test = np.transpose(label_test)
+
     # Convert labels to 1d numpy array
     label_train = np.ravel(label_train)
 
@@ -60,9 +64,18 @@ def classify(crimes): # crimes should be list of tuples (city_id, offense_id, la
     # Train classifier
     clf.fit(X_train,label_train)
 
-    # Print training mean accuracy
-    acc_train = clf.score(X_train,label_train)
-    print 'mean accuracy on training data...', acc_train # DEBUG    
+    # Perform 10-fold cross-validation
+    acc_folds = cross_validation.cross_val_score(clf,X_train,label_train,scoring='accuracy',cv=10)
+
+    # Print mean training accuracy
+    acc_trn = np.mean(acc_folds)
+    print 'accuracy on training data...',acc_trn # DEBUG
+
+    # Print mean testing accuracy
+    acc_test = clf.score(X_test,label_test)
+    print 'accuracy on testing data...', acc_test # DEBUG
+
+
 
 def main():
     # Get ready to use SQL
@@ -136,7 +149,7 @@ def main():
     # All cities together
     allCrimes = NYCrimes+ChiCrimes+BosCrimes+DenCrimes+PhillyCrimes
 
-    # And now... CLASSIFY!
+    # And now... CLASSIFY
     print '----------------New York----------------'
     classify(NYCrimes)
 
