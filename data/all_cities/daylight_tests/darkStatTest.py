@@ -10,8 +10,8 @@ def main():
     months = {'Jan':1, 'Feb':2, 'Mar':3, 'Apr':4, 'May':5, 'Jun':6, 'Jul':7, 'Aug':8, 'Sep': 9, 'Oct':10, 'Nov':11, 'Dec':12}
 
     # Get ready to use SQL
-    conn = sqlite3.connect("../crime.db")
-    cursor = conn.cursor();
+    conn = sqlite3.connect("../crime_new.db")
+    cursor = conn.cursor()
 
     # Query our database to build a dictionary of offense IDs to offense names
     crimes = {}
@@ -21,7 +21,6 @@ def main():
 
     # Now, what we actually care about:
     # Query our database to get hour, minute, month, day, and year for all crimes in all cities
-    events = []
     cursor.execute("select city_id,offense_id,hour,minute,month,day,year from (select * from fact \
             inner join time \
             on fact.time_id = time.id) time_join \
