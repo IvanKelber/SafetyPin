@@ -1,16 +1,6 @@
 import sqlite3
 import numpy as np
-from sklearn.preprocessing import scale
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn import cross_validation
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import LinearSVC
-
-# ---TO DO---
-# [] Be less silly with regard to transposing and then transposing back
-# [] Play around with balanced vs. not balanced class weights: So far, only not balanced is converging
-# [] Play around with solver for logistic regression: Currently using 'sag' because sklearn documentation said it was faster for large datasets
-# [] Calculate precision and recall for each class: Skipping for now because can tell that mostly just predicting THEFT
+from sklearn.linear_model import LinearRegression
 
 def classify(crimes,classifier): # crimes should be list of tuples (city_id, offense_id, lat, long, hour, minute) and clf should be 'logistic regression' or 'svm'
     # Get ready to use SQL
