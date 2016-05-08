@@ -2,6 +2,8 @@ import sqlite3
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
+#---IGNORE THIS SCRIPT FOR NOW---
+
 def classify(crimes,classifier): # crimes should be list of tuples (city_id, offense_id, lat, long, hour, minute) and clf should be 'logistic regression' or 'svm'
     # Get ready to use SQL
     conn = sqlite3.connect("../crime_new.db")

@@ -11,6 +11,10 @@ from sklearn.svm import LinearSVC
 # [] Play around with balanced vs. not balanced class weights: So far, only not balanced is converging
 # [] Play around with solver for logistic regression: Currently using 'sag' because sklearn documentation said it was faster for large datasets
 # [] Calculate precision and recall for each class: Skipping for now because can tell that mostly just predicting THEFT
+# [] Allow someone to input a specific time and location and receive predicted probabilties for each crime type
+
+
+
 
 def classify(crimes,classifier): # crimes should be list of tuples (city_id, offense_id, lat, long, hour, minute) and clf should be 'logistic regression' or 'svm'
     # Get ready to use SQL
@@ -78,11 +82,11 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
 
     # Print mean training accuracy
     acc_trn = np.mean(acc_folds)
-    print 'accuracy on training data...',acc_trn # DEBUG
+    print 'accuracy on training data...',acc_trn
 
     # Print mean testing accuracy
     acc_test = clf.score(X_test,label_test)
-    print 'accuracy on testing data...', acc_test # DEBUG
+    print 'accuracy on testing data...', acc_test
 
     # Print predicted labels for training set
     label_pred = clf.predict(X_test)
@@ -163,7 +167,7 @@ def main():
     # All cities together
     allCrimes = NYCrimes+ChiCrimes+BosCrimes+DenCrimes+PhillyCrimes
 
-    And now... CLASSIFY
+    # And now... CLASSIFY
     print '================Logistic Regression================'
     print '----------------New York----------------'
     classify(NYCrimes,'logistic regression')
