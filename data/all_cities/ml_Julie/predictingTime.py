@@ -2,7 +2,9 @@ import sqlite3
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-#---IGNORE THIS SCRIPT FOR NOW---
+# HASN'T BEEN CHANGED YET
+# will predict time of day from latitude, longitude, and type of crime (need to binarize -> look up built-in sklearn function)
+# will need polynomial features, I guess?
 
 def classify(crimes,classifier): # crimes should be list of tuples (city_id, offense_id, lat, long, hour, minute) and clf should be 'logistic regression' or 'svm'
     # Get ready to use SQL
