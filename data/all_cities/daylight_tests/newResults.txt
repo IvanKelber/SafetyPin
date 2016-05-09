@@ -1,0 +1,75 @@
+------------------------------------------------
+----- Across all cities and types of crime -----
+------------------------------------------------
+Daylight: 102553 incidents | Darkness: 395766 incidents
+P-Value: 2.47032822921e-323
+
+------------------------------------------------
+------ By city, across all types of crime ------
+------------------------------------------------
+NEWYORK
+Daylight: 22222 incidents | Darkness: 51876 incidents
+P-Value: 9.88131291682e-324
+
+CHICAGO
+Daylight: 6239 incidents | Darkness: 18096 incidents
+P-Value: 4.94065645841e-324
+
+BOSTON
+Daylight: 24149 incidents | Darkness: 48075 incidents
+P-Value: 9.88131291682e-324
+
+DENVER
+Daylight: 22481 incidents | Darkness: 31938 incidents
+P-Value: 9.88131291682e-324
+
+PHILLY
+Daylight: 27462 incidents | Darkness: 245781 incidents
+P-Value: 1.48219693752e-323
+
+------------------------------------------------
+----- By type of crime, across all cities ------
+------------------------------------------------
+HOMICIDE
+Daylight: 302 incidents | Darkness: 1442 incidents
+P-Value: 7.51120854445e-178
+
+CRIM SEXUAL ASSAULT
+Daylight: 419 incidents | Darkness: 3830 incidents
+P-Value: 0.0
+
+ROBBERY
+Daylight: 8821 incidents | Darkness: 38590 incidents
+P-Value: 4.94065645841e-324
+
+ASSAULT
+Daylight: 23898 incidents | Darkness: 119520 incidents
+P-Value: 9.88131291682e-324
+
+BURGLARY
+Daylight: 7671 incidents | Darkness: 35681 incidents
+P-Value: 4.94065645841e-324
+
+THEFT
+Daylight: 58304 incidents | Darkness: 184777 incidents
+P-Value: 1.48219693752e-323
+
+BATTERY
+Daylight: 1433 incidents | Darkness: 2748 incidents
+P-Value: 2.40714846399e-93
+
+WEAPONS VIOLATION
+Daylight: 1296 incidents | Darkness: 5271 incidents
+P-Value: 4.94065645841e-324
+
+OFFENSE INVOLVING CHILDREN
+Daylight: 69 incidents | Darkness: 454 incidents
+P-Value: 1.72842011796e-70
+
+HATECRIM
+Daylight: 13 incidents | Darkness: 22 incidents
+P-Value: 0.175465248991
+
+CRIM SEX OFFENSE
+Daylight: 327 incidents | Darkness: 3431 incidents
+P-Value: 0.0

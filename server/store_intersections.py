@@ -47,7 +47,8 @@ def main():
                 intersections[bag[i+1][0]]
                 coord1 = eval(bag[i][1])
                 coord2 = eval(bag[i+1][1])
-                distance = scipy.spatial.distance.euclidean(coord1,coord2) ** (1/2)
+                distance = scipy.spatial.distance.euclidean(coord1,coord2) ** (0.5)
+                # print ""distance
                 if distance > 0.03210958510321036: #average distance between two nodes * 2
                     continue
                 print("POINTS:",coord1,coord2)                             
