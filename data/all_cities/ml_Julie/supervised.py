@@ -1,4 +1,4 @@
-# Supervised learning algorithms (logistic regression and SVM) to predict TYPE OF CRIME from LATITUDE, LONGITUDE, and TIME
+# Supervised learning algorithms (logistic regression,SVM,KNN) to predict TYPE OF CRIME from LATITUDE, LONGITUDE, and TIME
 
 import sqlite3
 
@@ -10,8 +10,9 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn import cross_validation
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
+from sklearn.neighbors import KNeighborsClassifier
 
-# ---POTENTIAL IMPROVEMENTS---
+# ---POTENTIAL IMPROVEMENTS FOR LOGISTIC REGRESSION and/or SVM---
 # [] Play around with balanced vs. not balanced class weights: So far, only not balanced is converging, but balanced makes more sense for our dataset
 # [] Play around with solver for logistic regression: Currently using 'sag' because sklearn documentation said it was faster for large datasets
 # [] Calculate precision and recall for each class: Skipping for now because can tell that mostly just predicting THEFT
@@ -84,8 +85,10 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
         clf = LogisticRegression(solver='sag')
     elif classifier.lower() == 'svm':
         clf = LinearSVC()
+    elif classifier.lower() == 'knn':
+        clf = KNeighborsClassifier(n_neighbors=10,weights='distance')
     else:
-        print "please enter either 'logistic regression' or 'svm' as the classifier type"
+        print 'please enter a valid classifier type'
 
     # Train classifier
     clf.fit(X_train,label_train)
@@ -120,10 +123,10 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
     # Compute confusion matrix
     cm = confusion_matrix(label_test, pred_test)
     np.set_printoptions(precision=2)
-    print('Confusion matrix, without normalization')
-    print(cm)
-    plt.figure()
-    plot_confusion_matrix(cm)
+    # print('Confusion matrix, without normalization')
+    # print(cm)
+    # plt.figure()
+    # plot_confusion_matrix(cm)
 
     # Normalize the confusion matrix by row (i.e by the number of samples in each class)
     cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
@@ -201,43 +204,62 @@ def main():
     allCrimes = NYCrimes+ChiCrimes+BosCrimes+DenCrimes+PhillyCrimes
 
     # And now... CLASSIFY
-    print '================Logistic Regression================'
+    # print '================Logistic Regression================'
+    # print '----------------New York----------------'
+    # classify(NYCrimes,'logistic regression')
+
+    # print '----------------Chicago----------------'
+    # classify(ChiCrimes,'logistic regression')
+
+    # print '----------------Boston----------------'
+    # classify(BosCrimes,'logistic regression')    
+
+    # print '----------------Denver----------------'
+    # classify(DenCrimes,'logistic regression')
+
+    # print '----------------Philadelphia----------------'
+    # classify(PhillyCrimes,'logistic regression')
+
+    # print '----------------All Cities----------------'
+    # classify(allCrimes,'logistic regression')
+
+    # print '=======================SVM======================='
+    # print '----------------New York----------------'
+    # classify(NYCrimes,'svm')
+
+    # print '----------------Chicago----------------'
+    # classify(ChiCrimes,'svm')
+
+    # print '----------------Boston----------------'
+    # classify(BosCrimes,'svm')    
+
+    # print '----------------Denver----------------'
+    # classify(DenCrimes,'svm')
+
+    # print '----------------Philadelphia----------------'
+    # classify(PhillyCrimes,'svm')
+
+    # print '----------------All Cities----------------'
+    # classify(allCrimes,'svm')
+
+    print '===============K Nearest Neighbors==============='
     print '----------------New York----------------'
-    classify(NYCrimes,'logistic regression')
+    classify(NYCrimes,'knn')
 
     print '----------------Chicago----------------'
-    classify(ChiCrimes,'logistic regression')
+    classify(ChiCrimes,'knn')
 
     print '----------------Boston----------------'
-    classify(BosCrimes,'logistic regression')    
+    classify(BosCrimes,'knn')    
 
     print '----------------Denver----------------'
-    classify(DenCrimes,'logistic regression')
+    classify(DenCrimes,'knn')
 
     print '----------------Philadelphia----------------'
-    classify(PhillyCrimes,'logistic regression')
+    classify(PhillyCrimes,'knn')
 
     print '----------------All Cities----------------'
-    classify(allCrimes,'logistic regression')
-
-    print '=======================SVM======================='
-    print '----------------New York----------------'
-    classify(NYCrimes,'svm')
-
-    print '----------------Chicago----------------'
-    classify(ChiCrimes,'svm')
-
-    print '----------------Boston----------------'
-    classify(BosCrimes,'svm')    
-
-    print '----------------Denver----------------'
-    classify(DenCrimes,'svm')
-
-    print '----------------Philadelphia----------------'
-    classify(PhillyCrimes,'svm')
-
-    print '----------------All Cities----------------'
-    classify(allCrimes,'svm')
+    classify(allCrimes,'knn')
 
 if __name__ == '__main__':
     main()
