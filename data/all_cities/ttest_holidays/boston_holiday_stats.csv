@@ -1,0 +1,12 @@
+holiday,p-value,conclusion
+new year,0.18441803486659333,fail to reject null hypothesis
+martin luther,0.33382606110196833,fail to reject null hypothesis
+st.patrick,0.79442879124579147,fail to reject null hypothesis
+memorial,0.29671400680005422,fail to reject null hypothesis
+independence ,0.690346802920354,fail to reject null hypothesis
+labor,0.72699478564695452,fail to reject null hypothesis
+halloween,0.01725004151668268,REJECT NULL HYPOTHESIS
+thanksgiving,0.014301519154710502,REJECT NULL HYPOTHESIS
+blackfriday,0.60220824683977381,fail to reject null hypothesis
+christmas,0.013770650318401694,REJECT NULL HYPOTHESIS
+new year eve,0.79132577777901103,fail to reject null hypothesis
