@@ -1,0 +1,1 @@
+Graph of crime count on holidays and average crime count per day for that city is plotted. We picked some holidays where we expect a significant trend. Some of them are federal holidays, some are observances.
