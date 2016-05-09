@@ -101,13 +101,10 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
     acc_test = clf.score(X_test,label_test)
     print 'accuracy on testing data...', acc_test
 
-    # Print predicted labels for training set
-    label_pred = clf.predict(X_test)
-    print label_pred
-    for lbl in set(label_pred):
-        print crimetypes[lbl], ':', list(label_pred).count(lbl), 'predicted incidents'
+    # Return predicted labels for test set
+    pred_test = clf.predict(X_test)
 
-    # Lines 111 through 138 are borrowed from the sci-kit learn documentation:
+    # Lines 108 through 135 are borrowed from the sci-kit learn documentation:
     # http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
     def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Reds):
         plt.imshow(cm, interpolation='nearest', cmap=cmap)
@@ -121,7 +118,7 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
         plt.xlabel('Predicted label')
 
     # Compute confusion matrix
-    cm = confusion_matrix(label_test, label_pred)
+    cm = confusion_matrix(label_test, pred_test)
     np.set_printoptions(precision=2)
     print('Confusion matrix, without normalization')
     print(cm)
