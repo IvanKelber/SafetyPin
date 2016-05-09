@@ -258,7 +258,7 @@ def main():
     print '----------------Philadelphia----------------'
     classify(PhillyCrimes,'knn')
 
-    print '----------------All Cities----------------'
+    print '----------------All Cities but Boston----------------'
     classify(allCrimes,'knn')
 
 if __name__ == '__main__':
