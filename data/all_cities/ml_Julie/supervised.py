@@ -1,20 +1,21 @@
+# Supervised learning algorithms (logistic regression and SVM) to predict TYPE OF CRIME from LATITUDE, LONGITUDE, and TIME
+
 import sqlite3
+
 import numpy as np
+import matplotlib.pyplot as plt
+
 from sklearn.preprocessing import scale
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn import cross_validation
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 
-# ---TO DO---
-# [] Be less silly with regard to transposing and then transposing back
-# [] Play around with balanced vs. not balanced class weights: So far, only not balanced is converging
+# ---POTENTIAL IMPROVEMENTS---
+# [] Play around with balanced vs. not balanced class weights: So far, only not balanced is converging, but balanced makes more sense for our dataset
 # [] Play around with solver for logistic regression: Currently using 'sag' because sklearn documentation said it was faster for large datasets
 # [] Calculate precision and recall for each class: Skipping for now because can tell that mostly just predicting THEFT
-# [] Allow someone to input a specific time and location and receive predicted probabilties for each crime type
-
-
-
+# [] Idea of how to integrate with our app: Allow someone to input a specific time and location and receive predicted probabilties for each crime type
 
 def classify(crimes,classifier): # crimes should be list of tuples (city_id, offense_id, lat, long, hour, minute) and clf should be 'logistic regression' or 'svm'
     # Get ready to use SQL
@@ -22,17 +23,27 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
     cursor = conn.cursor()
 
     # Query our database to build a dictionary of offense IDs to offense names
-    crimetypes = {}
+    allcrimetypes = {}
     cursor.execute("select * from offense")
     for crime in cursor.fetchall():
-            crimetypes[crime[0]] = crime[1].encode('utf-8')
+            allcrimetypes[crime[0]] = crime[1].encode('utf-8')
 
     # Build data from location and time info
     data = []
+    citycrimes = []
     for incident in crimes:
-        # event = [latitude, longitude, time in minutes from midnight]
+        # event = [latitude, longitude, time in minutes from midnight, type of crime]
         event = [incident[2], incident[3], 60*incident[4]/100 + incident[5], incident[1]]
         data.append(event)
+
+        if incident[1] not in citycrimes: # We are building a list of crime types used in this city
+            citycrimes.append(incident[1])
+
+    # Restrict our dictionary of offense types to only those used for this city
+    crimetypes = {}
+    for offense in allcrimetypes:
+        if offense in citycrimes:
+            crimetypes[offense] = allcrimetypes[offense]
 
     # Transform data into numpy array
     data = np.array(data)
@@ -70,9 +81,11 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
 
     # Initialize classifier
     if classifier.lower() == 'logistic regression':
-        clf = LogisticRegression(solver='sag') # class_weight='balanced' didn't converge
+        clf = LogisticRegression(solver='sag')
     elif classifier.lower() == 'svm':
         clf = LinearSVC()
+    else:
+        print "please enter either 'logistic regression' or 'svm' as the classifier type"
 
     # Train classifier
     clf.fit(X_train,label_train)
@@ -94,17 +107,40 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
     for lbl in set(label_pred):
         print crimetypes[lbl], ':', list(label_pred).count(lbl), 'predicted incidents'
 
+    # Lines XXX through XXX are borrowed from the sci-kit learn documentation:
+    # http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+    def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Blues):
+        plt.imshow(cm, interpolation='nearest', cmap=cmap)
+        plt.title(title)
+        plt.colorbar()
+        tick_marks = np.arange(len(crimetypes))
+        plt.xticks(tick_marks, crimetypes.values(), rotation=90)
+        plt.yticks(tick_marks, crimetypes.values())
+        plt.tight_layout()
+        plt.ylabel('True label')
+        plt.xlabel('Predicted label')
+
+    # Compute confusion matrix
+    cm = confusion_matrix(label_test, label_pred)
+    np.set_printoptions(precision=2)
+    print('Confusion matrix, without normalization')
+    print(cm)
+    plt.figure()
+    plot_confusion_matrix(cm)
+
+    # Normalize the confusion matrix by row (i.e by the number of samples in each class)
+    cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    print('Normalized confusion matrix')
+    print(cm_normalized)
+    plt.figure()
+    plot_confusion_matrix(cm_normalized, title='Normalized confusion matrix')
+
+    plt.show()
 
 def main():
     # Get ready to use SQL
     conn = sqlite3.connect("../crime_new.db")
     cursor = conn.cursor()
-
-    # Query our database to build a dictionary of offense IDs to offense names ---TO DO--- use this somewhere or remove
-    crimes = {}
-    cursor.execute("select * from offense")
-    for crime in cursor.fetchall():
-            crimes[crime[0]] = crime[1].encode('utf-8')
 
     # Now, what we actually care about:
     # Query our database to get location and date/time info for all crimes for a given city
