@@ -107,9 +107,9 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
     for lbl in set(label_pred):
         print crimetypes[lbl], ':', list(label_pred).count(lbl), 'predicted incidents'
 
-    # Lines XXX through XXX are borrowed from the sci-kit learn documentation:
+    # Lines 111 through 138 are borrowed from the sci-kit learn documentation:
     # http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
-    def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Blues):
+    def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Reds):
         plt.imshow(cm, interpolation='nearest', cmap=cmap)
         plt.title(title)
         plt.colorbar()
