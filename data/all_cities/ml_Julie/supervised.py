@@ -107,7 +107,7 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
     # Return predicted labels for test set
     pred_test = clf.predict(X_test)
 
-    # Lines 108 through 135 are borrowed from the sci-kit learn documentation:
+    # Lines 111 through 137 below are borrowed from the sci-kit learn documentation:
     # http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
     def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Reds):
         plt.imshow(cm, interpolation='nearest', cmap=cmap)
@@ -123,8 +123,8 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
     # Compute confusion matrix
     cm = confusion_matrix(label_test, pred_test)
     np.set_printoptions(precision=2)
-    # print('Confusion matrix, without normalization')
-    # print(cm)
+    print('Confusion matrix, without normalization')
+    print(cm)
     # plt.figure()
     # plot_confusion_matrix(cm)
 
@@ -132,10 +132,9 @@ def classify(crimes,classifier): # crimes should be list of tuples (city_id, off
     cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
     print('Normalized confusion matrix')
     print(cm_normalized)
-    plt.figure()
-    plot_confusion_matrix(cm_normalized, title='Normalized confusion matrix')
-
-    plt.show()
+    # plt.figure()
+    # plot_confusion_matrix(cm_normalized, title='Normalized confusion matrix')
+    # plt.show()
 
 def main():
     # Get ready to use SQL
@@ -201,7 +200,8 @@ def main():
     PhillyCrimes = cursor.fetchall()
 
     # All cities together
-    allCrimes = NYCrimes+ChiCrimes+BosCrimes+DenCrimes+PhillyCrimes
+    #allCrimes = NYCrimes+ChiCrimes+BosCrimes+DenCrimes+PhillyCrimes
+    allCrimes = NYCrimes+ChiCrimes+DenCrimes+PhillyCrimes # all but Boston
 
     # And now... CLASSIFY
     # print '================Logistic Regression================'
@@ -249,8 +249,8 @@ def main():
     print '----------------Chicago----------------'
     classify(ChiCrimes,'knn')
 
-    print '----------------Boston----------------'
-    classify(BosCrimes,'knn')    
+    # print '----------------Boston----------------'
+    # classify(BosCrimes,'knn')    
 
     print '----------------Denver----------------'
     classify(DenCrimes,'knn')
