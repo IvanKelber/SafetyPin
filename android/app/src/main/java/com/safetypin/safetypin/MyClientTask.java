@@ -1,11 +1,12 @@
 package com.safetypin.safetypin;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.BufferedReader;
@@ -23,14 +24,12 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
     String dstAddress;
     int dstPort;
     String response;
-//    TextView textView;
     GoogleMap mMap;
-//    FileListView fileListView;
     private String message;
     private LatLng source;
     private LatLng destination;
-    private Context context; //Used exclusively for toast.
     OnEmptyResponseListener listener;
+    private ArrayList<Marker> crimes;
 
     public interface OnEmptyResponseListener {
         public void onEmptyReponse();
@@ -40,11 +39,11 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
         this.listener = listener;
     }
 
-    MyClientTask(String addr, int port, GoogleMap mMap, LatLng source, LatLng destination, Context context) {
+    MyClientTask(String addr, int port, GoogleMap mMap, LatLng source, LatLng destination, ArrayList<Marker> crimes) {
         dstAddress = addr;
         dstPort = port;
 //        this.textView = textView;
-        this.context = context;
+        this.crimes = crimes;
         this.mMap = mMap;
         this.source = source;
         this.destination = destination;
@@ -91,7 +90,8 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
 //            String[] fileArray = response.substring(1, response.length() - 2).split(",");
 //            textView.setText(response);
             Log.v("RECEIVED RESPONSE:",response);
-            ArrayList<LatLng> waypoints = parseResponse(response);
+            ArrayList<ArrayList<LatLng>> coords = parseResponse(response);
+            ArrayList<LatLng> waypoints = coords.get(0);
             Log.e("WAYPOINTS:",waypoints.toString() + "" + waypoints.size());
             if (waypoints.isEmpty()) {
                 Log.e("RECEIVED RESPONSE '[]'",response);
@@ -123,26 +123,42 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
             }
 //            fileListView.setFiles(Arrays.asList(fileArray));
             for (LatLng point : waypoints) {
-                mMap.addMarker(new MarkerOptions().position(point));
+                mMap.addMarker(new MarkerOptions().position(point)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            }
+
+            for (LatLng point : coords.get(1)) {
+                crimes.add(mMap.addMarker(new MarkerOptions().position(point)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).visible(false)));
             }
         }
         super.onPostExecute(result);
     }
 
-    private ArrayList<LatLng> parseResponse(String r) {
-        String k = r.substring(1,r.length()-2);
+    private ArrayList<ArrayList<LatLng>> parseResponse(String r) {
+        String k = r.substring(2,r.length()-2);
         Log.e("SPLIT STRING:",k);
         String regex = "\\), ";
-        ArrayList<LatLng> ret = new ArrayList<LatLng>();
-        String[] splits = k.split(regex);
-        for (String s : splits) {
-            try {
-                s += ")";
-                Double lat = Double.parseDouble(s.substring(1, s.indexOf(",")));
-                Double lng = Double.parseDouble(s.substring(s.indexOf(",") + 2, s.length() - 2));
-                ret.add(new LatLng(lat, lng));
-            } catch (StringIndexOutOfBoundsException e) {
-                Log.e("STRING INDEX OOB:",s);
+        ArrayList<ArrayList<LatLng>> ret = new ArrayList<>();
+        ret.add(new ArrayList<LatLng>());
+        ret.add(new ArrayList<LatLng>());
+        String[] coords = k.split("\\], \\[");
+        Log.e("WAYPOINTS:",coords[0]);
+        Log.e("CRIMES:",coords[1]);
+
+        for (int i = 0; i < 2; i++) {
+            String[] splits = coords[i].split(regex);
+            for (String s : splits) {
+                try {
+                    if (!s.contains(")")) {
+                        s += ")";
+                    }
+                    Double lat = Double.parseDouble(s.substring(1, s.indexOf(",")));
+                    Double lng = Double.parseDouble(s.substring(s.indexOf(",") + 2, s.length() - 2));
+                    ret.get(i).add(new LatLng(lat, lng));
+                } catch (StringIndexOutOfBoundsException e) {
+                    Log.e("STRING INDEX OOB:", s);
+                }
             }
 
         }
