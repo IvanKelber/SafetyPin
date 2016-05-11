@@ -20,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -64,7 +65,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 //        mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(this);
-        userLocation.add(mMap.addMarker(new MarkerOptions().position(startLocation).title("StartLocation")));
+        userLocation.add(mMap.addMarker(new MarkerOptions().position(startLocation).title("StartLocation")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 14.5f));
 
 //        LocationListener locationListener = new LocationListener() {
@@ -114,9 +116,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onPlaceSelected(Place place) {
         mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(userLocation.getFirst().getPosition()));
+        mMap.addMarker(new MarkerOptions().position(userLocation.getFirst().getPosition())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
         final LatLng destination = place.getLatLng();
-        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
+        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
         userDestination.add(m);
         if (userLocation.size() == 1) {
 //            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMiddle(destination, userLocation.getFirst().getPosition()), 13.5f));
@@ -161,8 +165,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapClick(final LatLng destination) {
         mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(userLocation.getFirst().getPosition()));
-        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
+        mMap.addMarker(new MarkerOptions().position(userLocation.getFirst().getPosition())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
         userDestination.add(m);
         if (userLocation.size() == 1) {
             updateCamera(m,userLocation.getFirst());
