@@ -481,7 +481,7 @@ def spitCoords(start,end):
     startMinimum = float("inf")
     endMinimum = float("inf")
     for node in nodesDict:
-        print str(nodesDict[node][0]) +"," + str(nodesDict[node][1])
+        # print str(nodesDict[node][0]) +"," + str(nodesDict[node][1])
 
         startDiff = scipy.spatial.distance.euclidean(nodesDict[node],start)
         # print startDiff,node
@@ -496,7 +496,7 @@ def spitCoords(start,end):
             nodes.add(endNode)
         else:
             nodes.add(Node(node,nodesDict[node]))
-    print "IMPORTANT THINGS:",startNode.reference,endNode.reference,endNode.coordinates
+    # print "IMPORTANT THINGS:",startNode.reference,endNode.reference,endNode.coordinates
 
     print ("Creating nodes took:",time.clock() - start_time, "seconds.")
     print("START NODE:",startNode.reference,startNode.coordinates)
@@ -521,7 +521,13 @@ def spitCoords(start,end):
     latlongs.reverse()
     print ("Reversing waypoints:",time.clock() - start_time, "seconds.")
 
-    return latlongs
+    if len(latlongs) > 0:
+        crimeCoords = []
+        for row in crimeLocs:
+            crimeCoords.append((row[7],row[8]))
+        return latlongs, crimeCoords
+    else:
+        return latlongs
 
 
 def setEdgeWeight(edge):
@@ -559,7 +565,8 @@ def setedgeWeights(mapGraph,crimeLocs):
         
         count = 0
         for loc in crimeLocs:
-            locDistance = math.sqrt(scipy.spatial.distance.euclidean(center,(loc[1],loc[2])))
+            locDistance = math.sqrt(scipy.spatial.distance.euclidean(center,(loc[7],loc[8])))
+            # print "CRIME LOCATION:",loc[7],loc[8]
             if locDistance <= distance:
                 count += 1
         trackCount.append(count)
