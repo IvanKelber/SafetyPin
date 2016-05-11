@@ -26,12 +26,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, PlaceSelectionListener, GoogleMap.OnMapClickListener {
+import java.util.ArrayList;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, PlaceSelectionListener,
+        GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
     private MarkerCache<Marker> userLocation = new MarkerCache<Marker>(1);
     private MarkerCache<Marker> userDestination= new MarkerCache<Marker>(1);
+    private ArrayList<Marker> crimes = new ArrayList<>();
     private TextView tv;
     private String serverAddress;
     private MarkerCache<Marker> currentMarkers = new MarkerCache<Marker>(2);
@@ -65,6 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 //        mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(this);
+        mMap.setOnMapLongClickListener(this);
         userLocation.add(mMap.addMarker(new MarkerOptions().position(startLocation).title("StartLocation")
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 14.5f));
@@ -134,7 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //            mct.execute();
             String[] addressInfo = serverAddress.split(":");
             MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),
-                    mMap,userLocation.getFirst().getPosition(),destination,getApplicationContext());
+                    mMap,userLocation.getFirst().getPosition(),destination,crimes);
             mct.setOnEmptyResponseListener(new MyClientTask.OnEmptyResponseListener() {
                 @Override
                 public void onEmptyReponse() {
@@ -174,7 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             updateCamera(m,userLocation.getFirst());
             String[] addressInfo = serverAddress.split(":");
             MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),
-                    mMap,userLocation.getFirst().getPosition(),destination,getApplicationContext());
+                    mMap,userLocation.getFirst().getPosition(),destination,crimes);
             mct.setOnEmptyResponseListener(new MyClientTask.OnEmptyResponseListener() {
                 @Override
                 public void onEmptyReponse() {
@@ -192,6 +197,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
         }
     }
+
 
     public LatLng getMiddle(LatLng l1, LatLng l2) {
 
@@ -228,4 +234,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(cu);
     }
 
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        Log.e("ON LONG CLICK LISTENER ACTIVATED","");
+        if (crimes.get(0).isVisible()) {
+
+            for (Marker crime : crimes) {
+                crime.setVisible(false);
+            }
+        } else {
+            for (Marker crime : crimes) {
+                crime.setVisible(true);
+            }
+        }
+    }
 }
