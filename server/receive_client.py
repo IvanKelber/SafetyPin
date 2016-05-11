@@ -33,21 +33,21 @@ def main():
             A = latLngs[0]
             B = latLngs[1]
 
-            print("A:",type(A[0]),"B:",type(B));
         except SyntaxError:
             #input isn't successful
             print("Unexpected Syntax")
             pass
         try:
-            # print("A:",A,"B:",B);
+        # print("A:",A,"B:",B);
             coords = spitCoords(A,B)
             # print("outputted Coords:",coords)
             out=repr(coords).encode('utf-8')
+            print "RESPONDING WITH:", out
             c.send(out)
 
         except UnboundLocalError:
-            #Input was not successful and A and B are not defined.
-            print("UnboundLocalError");
+            print("UnboundLocalError:  Perhaps someone clicked really far out.");
+            c.send("[]")
             pass
             
 

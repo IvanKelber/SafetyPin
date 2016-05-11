@@ -37,24 +37,41 @@ def main():
             continue
     print "Splitting streets and storing edges..."
     # edges = set()
+    beverley = streets["Beverley Road"]
+    for i in beverley:
+        print i[1]
+    for street,bag in streets.items():
+        print("=======================STREET",street,"=====================")
+        print("=======================BAG",bag,"=====================")
+        for item in bag:
+            print item[1]
+    return
+    # for street,bag in streets.items():
+    #     for item in bag:
+    #         print item[1]
+    # return
+
     for street,bag in streets.items():
         print("=======================STREET",street,"=====================")
         print("=======================BAG",bag,"=====================")
         for i in range(len(bag) - 1):
             try:
 
-                intersections[bag[i][0]]
-                intersections[bag[i+1][0]]
+
+
                 coord1 = eval(bag[i][1])
                 coord2 = eval(bag[i+1][1])
                 distance = scipy.spatial.distance.euclidean(coord1,coord2) ** (0.5)
                 # print ""distance
                 if distance > 0.03210958510321036: #average distance between two nodes * 2
                     continue
-                print("POINTS:",coord1,coord2)                             
+                # print("POINTS:",coord1,coord2)                             
 
                 c.execute("INSERT into edges\
                     VALUES(?,?,?,?,?,?,?)",(bag[i][0],bag[i+1][0],coord1[0],coord1[1],coord2[0],coord2[1],distance))
+                # prompt = str(coord1[0]) + "," + str(coord1[1]) +"\n"+ str(coord2[0]) + ","+ str(coord2[1])
+                # print prompt
+
             except KeyError:
                 continue
             except sqlite3.IntegrityError:
