@@ -168,34 +168,30 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
     }
 
     private ArrayList<LinkedHashMap<LatLng,Integer>> parseResponse(String r) {
-        String k = r.substring(2, r.length() - 2);
-        String regex = "\\), ";
         ArrayList<LinkedHashMap<LatLng,Integer>> ret = new ArrayList<>();
         ret.add(new LinkedHashMap<LatLng,Integer>());
         ret.add(new LinkedHashMap<LatLng,Integer>());
-        String[] coords = k.split("\\], \\[");
-        Log.e("WAYPOINTS:", coords[0]);
-        Log.e("CRIMES:", coords[1]);
+        try {
+            String k = r.substring(2, r.length() - 2);
+            String regex = "\\), ";
 
-        String[] points = coords[0].split(regex);
-        for (String s : points) {
+            String[] coords = k.split("\\], \\[");
+            Log.e("WAYPOINTS:", coords[0]);
+            Log.e("CRIMES:", coords[1]);
 
-            try {
+            String[] points = coords[0].split(regex);
+            for (String s : points) {
                 if (!s.contains(")")) {
                     s += ")";
                 }
                 Double lat = Double.parseDouble(s.substring(1, s.indexOf(",")));
                 Double lng = Double.parseDouble(s.substring(s.indexOf(",") + 2, s.length() - 2));
                 ret.get(0).put(new LatLng(lat, lng),0);
-            } catch (StringIndexOutOfBoundsException e) {
-                Log.e("STRING INDEX OOB:", s);
             }
-        }
 
 
-        String[] crimeInfo = coords[1].split(regex);
-        for (String s : crimeInfo) {
-            try {
+            String[] crimeInfo = coords[1].split(regex);
+            for (String s : crimeInfo) {
                 if (!s.contains(")")) {
                     s += ")";
                 }
@@ -203,9 +199,9 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
                 Double lat = Double.parseDouble(s.substring(ordinalIndexOf(s,',',0) + 2, ordinalIndexOf(s,',',1)));
                 Double lng = Double.parseDouble(s.substring(ordinalIndexOf(s,',',1) + 2, s.length() - 2));
                 ret.get(1).put(new LatLng(lat, lng),type);
-            } catch (StringIndexOutOfBoundsException e) {
-                Log.e("STRING INDEX OOB:", s);
             }
+        } catch (StringIndexOutOfBoundsException e) {
+            return ret;
         }
 
         return ret;
