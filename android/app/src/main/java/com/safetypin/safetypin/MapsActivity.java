@@ -36,13 +36,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MarkerCache<Marker> currentMarkers = new MarkerCache<Marker>(2);
     private LatLng startLocation;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Intent i = getIntent();
         serverAddress = i.getStringExtra("address");
-        startLocation = new LatLng(40.633204,-73.951);
+//        startLocation = new LatLng(40.647335,-73.968420);
+        startLocation = new LatLng(40.617471,-73.99962);
+
 
         tv = (TextView) findViewById(R.id.json_view);
         tv.setVisibility(View.GONE);
@@ -110,7 +113,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onPlaceSelected(Place place) {
-        LatLng destination = place.getLatLng();
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(userLocation.getFirst().getPosition()));
+        final LatLng destination = place.getLatLng();
         Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
         userDestination.add(m);
         if (userLocation.size() == 1) {
@@ -125,7 +130,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //            mct.execute();
             String[] addressInfo = serverAddress.split(":");
             MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),
-                    mMap,userLocation.getFirst().getPosition(),destination);
+                    mMap,userLocation.getFirst().getPosition(),destination,getApplicationContext());
+            mct.setOnEmptyResponseListener(new MyClientTask.OnEmptyResponseListener() {
+                @Override
+                public void onEmptyReponse() {
+                    android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    Bundle bundle = new Bundle();
+                    bundle.putDouble("lat",destination.latitude);
+                    bundle.putDouble("lng",destination.longitude);
+                    IntentFragment intentFragment = new IntentFragment();
+                    intentFragment.setArguments(bundle);
+                    intentFragment.show(ft, "TAG");
+                }
+            });
             mct.execute();
         } else {
             CameraUpdateFactory.newLatLngZoom(destination, 13.5f);
@@ -142,14 +159,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapClick(LatLng destination) {
+    public void onMapClick(final LatLng destination) {
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(userLocation.getFirst().getPosition()));
         Marker m = mMap.addMarker(new MarkerOptions().position(destination).title("Destination").draggable(true));
         userDestination.add(m);
         if (userLocation.size() == 1) {
             updateCamera(m,userLocation.getFirst());
             String[] addressInfo = serverAddress.split(":");
             MyClientTask mct = new MyClientTask(addressInfo[0],Integer.parseInt(addressInfo[1]),
-                    mMap,userLocation.getFirst().getPosition(),destination);
+                    mMap,userLocation.getFirst().getPosition(),destination,getApplicationContext());
+            mct.setOnEmptyResponseListener(new MyClientTask.OnEmptyResponseListener() {
+                @Override
+                public void onEmptyReponse() {
+                    android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    Bundle bundle = new Bundle();
+                    bundle.putDouble("lat",destination.latitude);
+                    bundle.putDouble("lng",destination.longitude);
+                    IntentFragment intentFragment = new IntentFragment();
+                    intentFragment.setArguments(bundle);
+                    intentFragment.show(ft, "TAG");
+                }
+            });
             mct.execute();
         } else {
             CameraUpdateFactory.newLatLngZoom(destination, 13.5f);

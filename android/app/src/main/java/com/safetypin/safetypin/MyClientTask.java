@@ -1,5 +1,6 @@
 package com.safetypin.safetypin;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -28,12 +29,22 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
     private String message;
     private LatLng source;
     private LatLng destination;
+    private Context context; //Used exclusively for toast.
+    OnEmptyResponseListener listener;
 
-    MyClientTask(String addr, int port, GoogleMap mMap, LatLng source, LatLng destination) {
+    public interface OnEmptyResponseListener {
+        public void onEmptyReponse();
+    }
+
+    public void setOnEmptyResponseListener(OnEmptyResponseListener listener) {
+        this.listener = listener;
+    }
+
+    MyClientTask(String addr, int port, GoogleMap mMap, LatLng source, LatLng destination, Context context) {
         dstAddress = addr;
         dstPort = port;
 //        this.textView = textView;
-        this.message = message;
+        this.context = context;
         this.mMap = mMap;
         this.source = source;
         this.destination = destination;
@@ -79,14 +90,37 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
         if(response != null) {
 //            String[] fileArray = response.substring(1, response.length() - 2).split(",");
 //            textView.setText(response);
-            ArrayList<LatLng> waypoints =parseResponse(response);
-
+            Log.v("RECEIVED RESPONSE:",response);
+            ArrayList<LatLng> waypoints = parseResponse(response);
+            Log.e("WAYPOINTS:",waypoints.toString() + "" + waypoints.size());
+            if (waypoints.isEmpty()) {
+                Log.e("RECEIVED RESPONSE '[]'",response);
+                listener.onEmptyReponse();
+            }
+            waypoints.add(0, source);
+            waypoints.add(destination);
 
 //            LatLng l = new LatLng(Double.parseDouble(latlng[0]),Double.parseDouble(latlng[1]));
 //            Marker m = mMap.addMarker(new MarkerOptions().position(l).title("Destination").draggable(true));
+            ArrayList<ArrayList<LatLng>> segments = new ArrayList<ArrayList<LatLng>>();
+            segments.add(new ArrayList<LatLng>());
 
-            DirectionsFetcher df = new DirectionsFetcher(mMap,source,destination,waypoints);
-            df.execute();
+            for (int i = 0; i < waypoints.size(); i++) {
+                    if (i != 0 && i % 22 == 0) {
+                        segments.get(segments.size() - 1).add(waypoints.get(i));
+                        segments.add(new ArrayList<LatLng>());
+                    }
+                segments.get(segments.size() - 1).add(waypoints.get(i));
+            }
+            for (ArrayList wp : segments) {
+                DirectionsFetcher df = new DirectionsFetcher(mMap,(LatLng)wp.get(0),(LatLng)wp.get(wp.size()-1),wp);
+                df.execute();
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 //            fileListView.setFiles(Arrays.asList(fileArray));
             for (LatLng point : waypoints) {
                 mMap.addMarker(new MarkerOptions().position(point));
@@ -102,10 +136,14 @@ public class MyClientTask extends AsyncTask<Void, Void, Void> {
         ArrayList<LatLng> ret = new ArrayList<LatLng>();
         String[] splits = k.split(regex);
         for (String s : splits) {
-            s += ")";
-            Double lat = Double.parseDouble(s.substring(1,s.indexOf(",")));
-            Double lng = Double.parseDouble(s.substring(s.indexOf(",")+2,s.length()-2));
-            ret.add(new LatLng(lat,lng));
+            try {
+                s += ")";
+                Double lat = Double.parseDouble(s.substring(1, s.indexOf(",")));
+                Double lng = Double.parseDouble(s.substring(s.indexOf(",") + 2, s.length() - 2));
+                ret.add(new LatLng(lat, lng));
+            } catch (StringIndexOutOfBoundsException e) {
+                Log.e("STRING INDEX OOB:",s);
+            }
 
         }
         return ret;

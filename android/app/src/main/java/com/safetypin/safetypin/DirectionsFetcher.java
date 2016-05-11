@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by Ivan on 4/29/2016.
  */
-public class DirectionsFetcher extends AsyncTask<Void, Integer, String> {
+public class DirectionsFetcher extends AsyncTask<LatLng, String, String> {
     private ArrayList<LatLng> locations = new ArrayList<>();
     private GoogleMap mMap;
     private LatLng source;
@@ -43,9 +43,10 @@ public class DirectionsFetcher extends AsyncTask<Void, Integer, String> {
 //        this.tv = tv;
     }
 
-    protected String doInBackground(Void... voids) {
+    protected String doInBackground(LatLng... latLngs) {
         String url = makeURL(source,destination);
         String json = getJSONFromURL(url);
+//        publishProgress(json);
         return json;
 
 //
@@ -60,7 +61,10 @@ public class DirectionsFetcher extends AsyncTask<Void, Integer, String> {
 //        return null;
     }
 
-    protected void onProgressUpdate(Integer... progress) {
+    protected void onProgressUpdate(String... progress) {
+        super.onProgressUpdate(progress);
+        drawPath(progress[0]);
+
     }
 
     protected void onPostExecute(String result) {
@@ -84,7 +88,12 @@ public class DirectionsFetcher extends AsyncTask<Void, Integer, String> {
         urlString.append(",");
         urlString.append(""+destination.longitude);
         urlString.append("&sensor=false&mode=walking&alternatives=false&region=us");
+        urlString.append("&waypoints=optimize:true:");
+        String poly = parseWaypoints(waypoints);
+        Log.e("POLYLINE:",poly);
+        urlString.append(poly);
         urlString.append("&key=AIzaSyDd6sGcDbxwXKGPm_FQ8p-qW1IDfDZWjpE");
+        Log.e("Total URL:",urlString.toString());
         return urlString.toString();
     }
 
@@ -141,6 +150,8 @@ public class DirectionsFetcher extends AsyncTask<Void, Integer, String> {
 
         }
     }
+
+
     private List<LatLng> decodePoly(String encoded) {
 
         List<LatLng> poly = new ArrayList<LatLng>();
@@ -173,5 +184,20 @@ public class DirectionsFetcher extends AsyncTask<Void, Integer, String> {
         }
 
         return poly;
+    }
+
+    private String parseWaypoints(ArrayList<LatLng> latlngs) {
+        StringBuilder parser = new StringBuilder();
+        for (LatLng l : latlngs) {
+            parser.append(l.latitude +","+ l.longitude +"|");
+        }
+        String parsed = parser.toString();
+        if(parsed.length() < 2) {
+            Log.e("PARSED < 2:",latlngs.toString());
+            return parsed;
+        }
+        parsed = parsed.substring(0,parsed.length()-2);
+//        return PolyUtil.encode(latlngs);
+        return parsed;
     }
 }
