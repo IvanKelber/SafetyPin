@@ -217,7 +217,7 @@ def getCrimes((midpoint,radius)):
     c = conn.cursor()
     # print area
     # print area[0][0],area[1][0],area[0][1],area[1][1]
-    query = "SELECT * FROM FACT f\
+    query = "SELECT f.OFFENSE_ID, l.latitude, l.longitude FROM FACT f\
     JOIN LOCATION L ON f.location_id = l.id \
     where \
     ("+str(midpoint[0]) +" - l.latitude)*("+str(midpoint[0])+" - l.latitude) + \
@@ -524,7 +524,7 @@ def spitCoords(start,end):
     if len(latlongs) > 0:
         crimeCoords = []
         for row in crimeLocs:
-            crimeCoords.append((row[7],row[8]))
+            crimeCoords.append((row[0],row[1],row[2]))
         return latlongs, crimeCoords
     else:
         return latlongs
@@ -565,8 +565,8 @@ def setedgeWeights(mapGraph,crimeLocs):
         
         count = 0
         for loc in crimeLocs:
-            locDistance = math.sqrt(scipy.spatial.distance.euclidean(center,(loc[7],loc[8])))
-            # print "CRIME LOCATION:",loc[7],loc[8]
+            locDistance = math.sqrt(scipy.spatial.distance.euclidean(center,(loc[1],loc[2])))
+            # print "CRIME LOCATION:",loc[1],loc[2]
             if locDistance <= distance:
                 count += 1
         trackCount.append(count)
