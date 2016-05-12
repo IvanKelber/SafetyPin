@@ -1,7 +1,6 @@
 package com.safetypin.safetypin;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
@@ -42,35 +41,11 @@ public class MainActivity extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this,MapsActivity.class);
-                i.putExtra("address",addr.getText().toString());
-                startActivity(i);
-            }
-        });
+                Intent i = new Intent(MainActivity.this, MapsActivity.class);
+                i.putExtra("address", addr.getText().toString());
+                overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
 
-        button.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=Brown+University,Providence");
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                startActivity(mapIntent);
-//                try {
-//                    PackageManager pm = getApplicationContext().getPackageManager();
-//                    pm.getPackageInfo("com.ubercab", PackageManager.GET_ACTIVITIES);
-//                    String uri =
-//                            "uber://?action=setPickup&pickup=my_location&client_id=YOUR_CLIENT_ID";
-//                    Intent intent = new Intent(Intent.ACTION_VIEW);
-//                    intent.setData(Uri.parse(uri));
-//                    startActivity(intent);
-//                } catch (PackageManager.NameNotFoundException e) {
-//                    // No Uber app! Open mobile website.
-//                    String url = "https://m.uber.com/sign-up?client_id=YOUR_CLIENT_ID";
-//                    Intent i = new Intent(Intent.ACTION_VIEW);
-//                    i.setData(Uri.parse(url));
-//                    startActivity(i);
-//                }
-                return true;
+                startActivity(i);
             }
         });
     }
