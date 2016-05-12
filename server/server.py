@@ -9,6 +9,9 @@ from datetime import datetime
 import numpy
 import sqlite3
 import time
+from isItDark import isItDark
+from collections import defaultdict
+import datetime
 
 try:
     from xml.etree import cElementTree as ET
@@ -213,12 +216,15 @@ def getArea(coord1, coord2):
 
 # get crimes in the given perimeter
 def getCrimes((midpoint,radius)):
-    conn = sqlite3.connect('../data/all_cities/crime.db')
+    # crimes = {'0':0,'1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0,'10':0}
+    crimesDark = defaultdict(lambda:0)
+    crimesDay = defaultdict(lambda:0)
+    conn = sqlite3.connect('../data/all_cities/crime_new.db')
     c = conn.cursor()
     # print area
     # print area[0][0],area[1][0],area[0][1],area[1][1]
-    query = "SELECT f.OFFENSE_ID, l.latitude, l.longitude FROM FACT f\
-    JOIN LOCATION L ON f.location_id = l.id \
+    query = "SELECT f.OFFENSE_ID, l.latitude, l.longitude, c.name, d.month, d.day, d.year, t.hour, t.minute FROM FACT f\
+    JOIN LOCATION L ON f.location_id = l.id  JOIN TIME T ON f.Time_Id = t.id JOIN DATE D ON f.date_id = d.id JOIN CITY C ON f.City_Id = c.id\
     where \
     ("+str(midpoint[0]) +" - l.latitude)*("+str(midpoint[0])+" - l.latitude) + \
     ("+str(midpoint[1])+" - l.longitude)*("+str(midpoint[1])+" - l.longitude) < "+ str(radius * radius)+";"
@@ -227,10 +233,19 @@ def getCrimes((midpoint,radius)):
     #     " AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
     c.execute(query)
     crimeLocs = []
-    for row in c:       
-        crimeLocs.append(row)
+    for row in c:   
+        isIt = isItDark(list(row)[3:])
+        if isIt:
+            crimeLocs.append(list(row)+[1])
+            crimesDark[str(row[0])] += 1
+            continue
+        crimeLocs.append(list(row)+[0])
+        crimesDay[str(row[0])] += 1
     conn.close()
-
+    # print crimesDay
+    # print crimesDark
+    # print len(crimeLocs),"******************************"
+    # print crimeLocs[0]
     return crimeLocs
 
 
@@ -360,8 +375,8 @@ def dijkstras(mapGraph,start,end):
 
     latLngs = [end.coordinates]
     temp = end.reference
-    for k,v in path.items():
-        print k,v.reference
+    # for k,v in path.items():
+    #     print k,v.reference
 
 
     while temp is not start.reference:
@@ -373,6 +388,8 @@ def dijkstras(mapGraph,start,end):
             for k,v in path.items():
                 print k,v.reference
             return []
+    for latLng in latLngs:
+        print str(latLng[0])+","+str(latLng[1])
 
     return latLngs
 
@@ -550,9 +567,17 @@ def setEdgeWeight(edge):
     c.execute(query)
     edge.crimeWeight = len(c.fetchall()) + 1
 
+
 # calculate weight for each edge
 def setedgeWeights(mapGraph,crimeLocs):
     trackCount = [0]
+    TimeNow = datetime.datetime.now()
+    mo = TimeNow.month
+    d = TimeNow.day
+    y = TimeNow.year
+    h = TimeNow.hour
+    mi = TimeNow.minute
+    DarkNow = ~isItDark((crimeLocs[0][3],mo,d,y-1,h,mi))
     for edge in mapGraph.edges:
         start_time = time.clock()
         intersection1 = edge.coord1
@@ -564,13 +589,20 @@ def setedgeWeights(mapGraph,crimeLocs):
             continue        
         
         count = 0
+        totalCount = 0
+        # print crimeLocs
         for loc in crimeLocs:
+            # print "CRIME LOCATION:",loc
             locDistance = math.sqrt(scipy.spatial.distance.euclidean(center,(loc[1],loc[2])))
-            # print "CRIME LOCATION:",loc[1],loc[2]
             if locDistance <= distance:
-                count += 1
-        trackCount.append(count)
-        edge.crimeWeight = count
+                if DarkNow and loc[-1] == 1:
+                    count += 1
+                elif not(DarkNow) and loc[-1] == 0:
+                    count += 1
+                totalCount += 1
+        weightedAvg = (2*count + (totalCount-count))/float(3)
+        trackCount.append(weightedAvg)
+        edge.crimeWeight = weightedAvg
         # print("Time for single edge weight:",time.clock()-start_time, "seconds")
     
     maxWeight = max(trackCount)
@@ -592,8 +624,8 @@ def setedgeWeights(mapGraph,crimeLocs):
 
 
 def main():
-    # start = (40.647335,-73.968420)
-    # end = (40.643175,-73.968584)
+    start = (40.647335,-73.968420)
+    end = (40.643175,-73.968584)
     
     # A = Node("A",(0,0))
     # B = Node("B",(0,0))
@@ -625,8 +657,8 @@ def main():
     # dijkstras(g,A,G)
     # start = (40.633204,-73.951)
     # end = (40.64010457, -73.9559158)
-    # spitCoords(start,end)
-    pass
+    spitCoords(start,end)
+    # pass
 # <<<<<<< HEAD
 #     start = (40.647335,-73.968420)
 #     end = (40.643175,-73.968584)
