@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+"""
+Running this program results in creating a database of intersections and streets as
+nodes and edges respectively.  This database will be queried in server.py in order
+to create a local graph based off of the user's location and destination.
+"""
+
+
 import scipy
 from server import *
 import sys
@@ -8,6 +15,7 @@ import sqlite3
 import time
 
 def main():
+
     start = time.clock()
     print "Extracting intersections and streets..."
     intersections, streets = extract_intersections(sys.argv[1])

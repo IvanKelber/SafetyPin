@@ -1,5 +1,17 @@
 #!/usr/bin/env python
 
+
+"""
+This file contains all of the computation done by the server.  It's primary
+function 'spitCoords' is called by receive_client.py when the client connects.
+It also contains a vital function 'extract_intersections' that parses the OSM XML
+file and returns intersections/street data.  This is used exclusively in 
+store_intersections.py but was once planned on being used dynamically.
+"""
+
+
+
+
 import scipy
 from graphs import *
 import operator
@@ -19,14 +31,14 @@ AVERAGE_STREET_LENGTH = 0.024868578457151
 
 # CITY_BOUNDS = {"BOSTON":,"NEWYORK":,"CHICAGO":,"PHILADELPHIA",:"DENVER":}
 
-def extract_intersections(osm, verbose=True):
+def extract_intersections(osm):
     # This function takes an osm file as an input. It then goes through each xml 
     # element and searches for nodes that are shared by two or more ways.
+    # While discovering intersections it will also store street information
     # Parameter:
     # - osm: An xml file that contains OpenStreetMap's map information
-    # - verbose: If true, print some outputs to terminal.
     # 
-    # Ex) extract_intersections('WashingtonDC.osm')
+    # Ex) extract_intersections('brooklyn.osm')
     tree = ET.parse(osm)
     root = tree.getroot()
     counter = {}
@@ -123,8 +135,13 @@ def extract_intersections(osm, verbose=True):
 
 
 
-# find the two most distant intersections on a street
 def findEndPoints(bag,coordinates):
+    """ 
+    This function takes an unordered set of intersections on a street
+    and returns the two intersections that are the farthest away from each
+    other.  This will then be used in ordering.
+    """
+
     biggest = 0
     biggestEndpoints = []
     for int1 in bag:
@@ -150,6 +167,10 @@ def findEndPoints(bag,coordinates):
 
 # find order of the intersections for a street
 def findOrder(bag,coordinates):
+    """
+    This function will order the sets of unordered intersections
+    based off of euclidean distance.
+    """
     endPoints = findEndPoints(bag,coordinates)
     try:
         endCoordinate = eval(coordinates[endPoints[0]])
@@ -176,7 +197,9 @@ def findOrder(bag,coordinates):
 
 # returns four lat-long pairs between two inputs 
 def getArea(coord1, coord2):
-
+    """
+    Takes two coordinate points and returns the midpoint and radius.
+    """
     # slope = calcLineSlope(coord1[0],coord1[1],coord2[0],coord2[1])
     center = getMidpoint(coord1,coord2)
     return (center,scipy.spatial.distance.euclidean(coord1,coord2) ** .5 / float(10))
@@ -213,6 +236,10 @@ def getArea(coord1, coord2):
 
 # get crimes in the given perimeter
 def getCrimes((midpoint,radius)):
+    """
+    Queries the SQL database containing all of the crime data
+    for all crimes within a specified radius of the specified midpoint.
+    """
     conn = sqlite3.connect('../data/all_cities/crime.db')
     c = conn.cursor()
     # print area
@@ -237,6 +264,10 @@ def getCrimes((midpoint,radius)):
 
 # get intersections in given perimeter
 def getIntersections((midpoint,radius)):
+    """
+    Queries the SQL database containing all of the intersection 
+    and edge data for edges within a specified radius of the specified midpoint.
+    """
     conn = sqlite3.connect('./intersection0.db')
     c = conn.cursor()
 
@@ -262,47 +293,20 @@ def getIntersections((midpoint,radius)):
 
 
 
-# given a line and a point check where the point is w.r.t the line
-def linePoint(bounds,loc):
-  slope = calcLineSlope(bounds[0][0],bounds[0][1],bounds[1][0],bounds[1][1])
-  intercept = calcLineIntercept(slope,bounds[0][0],bounds[0][1])
-  
-  return (loc[1] - (slope*loc[0] + intercept))
-
-
-
-# draw parallelogram given two points
-def drawParallelogram(area,loc):
-  # line one h[0]-v[0]
-  if linePoint([area[0][0],area[1][0]],loc) > 0:
-      return False
-  # line two h[0]-v[1]
-  elif linePoint([area[0][0],area[1][1]],loc) < 0:
-      return False
-  # line three v[0]-h[1]
-  elif linePoint([area[1][0],area[0][1]],loc) > 0:
-      return False
-  # line four v[1]-h[1]
-  elif linePoint([area[1][1],area[0][1]],loc) <  0:
-      return False
-  else:
-      return True
-
-
 
 # calculate line slope
-def calcLineSlope(x1, y1, x2, y2):
-    if x1 == x2:
-        return "infinite"
-    return (y1 - y2)/float(x1 - x2)
+# def calcLineSlope(x1, y1, x2, y2):
+#     if x1 == x2:
+#         return "infinite"
+#     return (y1 - y2)/float(x1 - x2)
 
 
 
-# calculate line intercept
-def calcLineIntercept(m,x,y):
-    if m != "infinite":
-            return y - m*x
-    return 0
+# # calculate line intercept
+# def calcLineIntercept(m,x,y):
+#     if m != "infinite":
+#             return y - m*x
+#     return 0
 
 
 
@@ -380,6 +384,9 @@ def dijkstras(mapGraph,start,end):
 
 # dijkstra's shortest path
 def shortestPath(queue,distance):
+    """
+    Used in Dijkra's algorithm to determine which node to visit next.
+    """
     minWeight = float("inf")
     reqNode = 0
     for node in queue:
@@ -391,21 +398,29 @@ def shortestPath(queue,distance):
 
 
 
-# calculate weight for each crime
-def setcrimeWeights(count):
-    crimeType = {'Personal':['HOMICIDE','CRIM SEXUAL ASSAULT','HATECRIME','OFFENSE INVOLVING CHILDREN','CRIM SEX OFFENSE',\
-                'WEAPONS VIOLATION','ASSAULT'],'Property':['ROBBERY','BURGLARY','THEFT','BATTERY','']}
-    crimeWeights = {}
-    for crime in count:
-        if crime not in crimeWeights:
-            crimeWeights[crime] = 1
+# # calculate weight for each crime
+# def setcrimeWeights(count):
+#     crimeType = {'Personal':['HOMICIDE','CRIM SEXUAL ASSAULT','HATECRIME','OFFENSE INVOLVING CHILDREN','CRIM SEX OFFENSE',\
+#                 'WEAPONS VIOLATION','ASSAULT'],'Property':['ROBBERY','BURGLARY','THEFT','BATTERY','']}
+#     crimeWeights = {}
+#     for crime in count:
+#         if crime not in crimeWeights:
+#             crimeWeights[crime] = 1
 
-    return crimeWeights
+#     return crimeWeights
 
 
 
 # function gives all the required intersection coordinates
 def spitCoords(start,end):
+    """
+    This is the function that puts all of the functionality together.
+    Given two points, it will get all relevant crime and intersection data
+    from the databases available.  Then it will create the graph
+    based on intersection data.  Then it will weight the nodes based on crime
+    data.  Finally it runs dijkstras algorithm on the graph and returns the list
+    of waypoints and the list of crime locations.
+    """
     ### CRIMES
     # determine perimeter for crimes
     # print(start,end)
@@ -530,28 +545,34 @@ def spitCoords(start,end):
         return latlongs
 
 
-def setEdgeWeight(edge):
-    node1 = edge.coord1
-    node2 = edge.coord2
-    radius = scipy.spatial.distance.euclidean(node1,node2)/2
-    midpoint = getMidpoint(node1,node2)
-    conn = sqlite3.connect('../data/all_cities/crime.db')
-    c = conn.cursor()
-    # print area
-    # print area[0][0],area[1][0],area[0][1],area[1][1]
-    query = "SELECT * FROM FACT f\
-    JOIN LOCATION L ON f.location_id = l.id \
-    where \
-    ("+str(midpoint[0]) +" - l.latitude)*("+str(midpoint[0])+" - l.latitude) + \
-    ("+str(midpoint[1])+" - l.longitude)*("+str(midpoint[1])+" - l.longitude) < "+ str(radius * radius)+";"
-    # c.execute("SELECT T.LID,T.LATITUDE,T.LONGITUDE,T.OFFENSE_ID,O.TYPE FROM OFFENSE O,(SELECT L.ID LID,LATITUDE,LONGITUDE,OFFENSE_ID FROM LOCATION L,FACT F WHERE (LATITUDE BETWEEN "\
-    #     +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "+str(max(area[0][1],area[1][1]))+\
-    #     " AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
-    c.execute(query)
-    edge.crimeWeight = len(c.fetchall()) + 1
+# def setEdgeWeight(edge):
+#     node1 = edge.coord1
+#     node2 = edge.coord2
+#     radius = scipy.spatial.distance.euclidean(node1,node2)/2
+#     midpoint = getMidpoint(node1,node2)
+#     conn = sqlite3.connect('../data/all_cities/crime.db')
+#     c = conn.cursor()
+#     # print area
+#     # print area[0][0],area[1][0],area[0][1],area[1][1]
+#     query = "SELECT * FROM FACT f\
+#     JOIN LOCATION L ON f.location_id = l.id \
+#     where \
+#     ("+str(midpoint[0]) +" - l.latitude)*("+str(midpoint[0])+" - l.latitude) + \
+#     ("+str(midpoint[1])+" - l.longitude)*("+str(midpoint[1])+" - l.longitude) < "+ str(radius * radius)+";"
+#     # c.execute("SELECT T.LID,T.LATITUDE,T.LONGITUDE,T.OFFENSE_ID,O.TYPE FROM OFFENSE O,(SELECT L.ID LID,LATITUDE,LONGITUDE,OFFENSE_ID FROM LOCATION L,FACT F WHERE (LATITUDE BETWEEN "\
+#     #     +str(min(area[0][0],area[1][0]))+" AND "+str(max(area[0][0],area[1][0]))+" ) AND (LONGITUDE BETWEEN "+str(min(area[0][1],area[1][1]))+" AND "+str(max(area[0][1],area[1][1]))+\
+#     #     " AND L.ID = F.LOCATION_ID)) AS T WHERE T.OFFENSE_ID = O.ID")
+#     c.execute(query)
+#     edge.crimeWeight = len(c.fetchall()) + 1
 
 # calculate weight for each edge
 def setedgeWeights(mapGraph,crimeLocs):
+    """
+    Takes a graph and a list of crime locations and weights the edges
+    of the graph based off of proximity to crimes.  It does this simply
+    by iterating through edges and then crime locations and then compares
+    their locations.
+    """
     trackCount = [0]
     for edge in mapGraph.edges:
         start_time = time.clock()

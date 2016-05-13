@@ -4,6 +4,16 @@ import osmapi,socket,os
 from get_osm import *
 from server import *
 
+
+"""
+This program is a very simple server that just directs the input from the client
+(two latitude-longitude coordinates) to 'spitCoords' a function in server.py that
+does all of the computation.  Then receive client sends the list of waypoints
+and list of crimes back to the client and waits for another request.
+"""
+
+
+
 def main():
     s = socket.socket()
     host = socket.gethostbyname(socket.gethostname())
