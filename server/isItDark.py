@@ -1,6 +1,8 @@
 import sys
 import math
-
+"""
+Function to find whether a given time on a particular day was before or after sunset
+"""
 # INPUT: city name (string corresponding to that city's directory in our github repo), month (int), day (int), year (int), hour (int), and minute (int)
 
 def isItDark((city, mo, d, y, h, mi)):
