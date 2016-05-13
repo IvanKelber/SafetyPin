@@ -5,7 +5,7 @@ Running the app for existing osm data -
 
 1) Run receive_client.py on the server with appropriate IP address and port number
 2) Install the app apk in your phone
-3) Open the installed mobile app and connect to the server
+3) Open the installed mobile app and enter the server address and port number
 
 Running the app for new osm data - 
 
