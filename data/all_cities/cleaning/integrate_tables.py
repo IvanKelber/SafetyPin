@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
-"""
-This program was created in order to save us from a disaster.  Once we had each cleaned
-our city's data and stored the crime data into 5 different csv files (per city) we realized
-that we now faced the problem of merging these 25 csv files into exactly 5.
-This was particularly important for overlapping categories like time and date.
+# """
+# This program was created in order to save us from a disaster.  Once we had each cleaned
+# our city's data and stored the crime data into 5 different csv files (per city) we realized
+# that we now faced the problem of merging these 25 csv files into exactly 5.
+# This was particularly important for overlapping categories like time and date.
 
-This program takes two csv files 'first' and 'second' and merges the 10 csv files associated
-with them into 5 csv files with no duplicate information and everything mapping to the 
-correct unique ID.
-"""
+# This program takes two csv files 'first' and 'second' and merges the 10 csv files associated
+# with them into 5 csv files with no duplicate information and everything mapping to the 
+# correct unique ID.
+# """
 
 
 

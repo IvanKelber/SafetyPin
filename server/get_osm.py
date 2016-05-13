@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 
-"""
-This program was designed to request local XML data from the OSM API.  We planned
-on using this dynamically so that when the user selected where they were we would 
-parse the intersection data, store it in a database for later use, and then continue
-processing the user's request.  However, we soon realized that this is infeasible 
-due to the data request limitation of the OSM API.  We then resorted to downloading
-the XML offline and pre-processing.
-"""
+# """
+# This program was designed to request local XML data from the OSM API.  We planned
+# on using this dynamically so that when the user selected where they were we would 
+# parse the intersection data, store it in a database for later use, and then continue
+# processing the user's request.  However, we soon realized that this is infeasible 
+# due to the data request limitation of the OSM API.  We then resorted to downloading
+# the XML offline and pre-processing.
+# """
 
 
 import osmapi

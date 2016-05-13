@@ -4,12 +4,12 @@ import csv
 import re
 import operator
 
-"""
-This program was meant to clean the NY crime csv file.
-It separates all of the information that we wanted to consider 
-into different csv files so that we can later store the data in our 
-SQL database.
-"""
+# """
+# This program was meant to clean the NY crime csv file.
+# It separates all of the information that we wanted to consider 
+# into different csv files so that we can later store the data in our 
+# SQL database.
+# """
 
 
 def main():

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 
-"""
-This file contains all of the computation done by the server.  It's primary
-function 'spitCoords' is called by receive_client.py when the client connects.
-It also contains a vital function 'extract_intersections' that parses the OSM XML
-file and returns intersections/street data.  This is used exclusively in 
-store_intersections.py but was once planned on being used dynamically.
-"""
+# """
+# This file contains all of the computation done by the server.  It's primary
+# function 'spitCoords' is called by receive_client.py when the client connects.
+# It also contains a vital function 'extract_intersections' that parses the OSM XML
+# file and returns intersections/street data.  This is used exclusively in 
+# store_intersections.py but was once planned on being used dynamically.
+# """
 
 
 
@@ -36,12 +36,12 @@ AVERAGE_STREET_LENGTH = 0.024868578457151
 
 
 def extract_intersections(osm):
-"""
-This function is used to extract intersections and map them to relevant streeets 
-from osm files enabling us to create graphs of maps with intersections as nodes and 
-street segments as edges. The function is used while storing the information of cities 
-intially into the SQLite database.
-"""
+    """
+    This function is used to extract intersections and map them to relevant streeets 
+    from osm files enabling us to create graphs of maps with intersections as nodes and 
+    street segments as edges. The function is used while storing the information of cities 
+    intially into the SQLite database.
+    """
     # This function takes an osm file as an input. It then goes through each xml 
     # element and searches for nodes that are shared by two or more ways.
     # While discovering intersections it will also store street information
@@ -246,18 +246,15 @@ def getArea(coord1, coord2):
 
 # get crimes in the given perimeter
 def getCrimes((midpoint,radius)):
-<<<<<<< HEAD
     """
     Queries the SQL database containing all of the crime data
     for all crimes within a specified radius of the specified midpoint.
     """
     conn = sqlite3.connect('../data/all_cities/crime.db')
-=======
     # crimes = {'0':0,'1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0,'10':0}
     crimesDark = defaultdict(lambda:0)
     crimesDay = defaultdict(lambda:0)
     conn = sqlite3.connect('../data/all_cities/crime_new.db')
->>>>>>> c861ca446dd3e31b5ca6b5e7e3213ea03faa0c60
     c = conn.cursor()
     # print area
     # print area[0][0],area[1][0],area[0][1],area[1][1]

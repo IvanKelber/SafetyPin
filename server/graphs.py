@@ -1,16 +1,17 @@
 
 
-"""
-This file contains the classes used to create our simple Graph implementations.
-"""
+# """
+# This file contains the classes used to create our simple Graph implementations.
+# """
 
 import scipy
 
 
-"""
-class Node simply stores a unique reference id and a tuple of coordinates.
-"""
+
 class Node:
+	"""
+	class Node simply stores a unique reference id and a tuple of coordinates.
+	"""
 
 	reference = ""
 	coordinates = ""
@@ -19,13 +20,14 @@ class Node:
 		self.reference = reference
 		self.coordinates = coordinates
 
-"""
-class Edge simply contains the references to both nodes as well
-as their locations. In addition it contains the euclidean length of the edge.
-Each edge has a crimeWeight field that is updated later according to crimes in the 
-vicinity.
-"""
+
 class Edge:
+	"""
+	class Edge simply contains the references to both nodes as well
+	as their locations. In addition it contains the euclidean length of the edge.
+	Each edge has a crimeWeight field that is updated later according to crimes in the 
+	vicinity.
+	"""
 	
 	# reference = ""
 	node1 = None
@@ -44,12 +46,13 @@ class Edge:
 		self.length = length
 
 
-"""
-class Graph simply contains a set of nodes and a set of edges between those
-nodes.
-"""
+
 
 class Graph:
+	"""
+	class Graph simply contains a set of nodes and a set of edges between those
+	nodes.
+	"""
 
 	nodes = set()
 	edges = set()
