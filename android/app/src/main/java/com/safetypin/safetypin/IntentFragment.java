@@ -38,7 +38,7 @@ public class IntentFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Oops!")
                 .setMessage("Looks like we are missing some relevant data in that path.  " +
-                            "Your best bet may be Uber or Google Maps")
+                            "Your safest bet may be Uber or Google Maps")
                 .setView(view)
                 .setPositiveButton("Google Maps", new DialogInterface.OnClickListener() {
                         @Override

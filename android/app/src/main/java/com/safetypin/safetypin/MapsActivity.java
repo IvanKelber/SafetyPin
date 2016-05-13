@@ -237,15 +237,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapLongClick(LatLng latLng) {
         Log.e("ON LONG CLICK LISTENER ACTIVATED","");
-        if (crimes.get(0).isVisible()) {
+        try {
+            if (crimes.get(0).isVisible()) {
 
-            for (Marker crime : crimes) {
-                crime.setVisible(false);
+                for (Marker crime : crimes) {
+                    crime.setVisible(false);
+                }
+            } else {
+                for (Marker crime : crimes) {
+                    crime.setVisible(true);
+                }
             }
-        } else {
-            for (Marker crime : crimes) {
-                crime.setVisible(true);
-            }
+        } catch (IndexOutOfBoundsException e) {
+            Log.e("IndexOutOfBounds:","Long click when crimes is empty");
         }
     }
 }

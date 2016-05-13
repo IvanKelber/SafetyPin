@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.bar:hover {
+  fill: #1a1aff;
+}
+
+.axis {
+  font: 9px verdana;
+}
+
+.axis path{
+  fill: none;
+  stroke: #000;
+}
+
+.axis line {
+  stroke: #000;
+  }
+
+
+</style>
+<body>
+<script src="//d3js.org/d3.v3.min.js"></script>
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg .tg-fvqs{color:#f8a102}
+.tg .tg-4iab{color:#343434}
+.tg .tg-rqk3{color:#f8a102;vertical-align:top}
+.tg .tg-mejs{color:#fe0000;vertical-align:top}
+</style>
+<table class="tg" align="right">
+  <tr>
+    <th class="tg-4iab">Month on X axis</th>
+  </tr>
+  <tr>
+    <td class="tg-fvqs">January</td>
+  </tr>
+  <tr>
+    <td class="tg-fvqs">February</td>
+  </tr>
+  <tr>
+    <td class="tg-fvqs">March</td>
+  </tr>
+  <tr>
+    <td class="tg-rqk3">April</td>
+  </tr>
+  <tr>
+    <td class="tg-rqk3">May</td>
+  </tr>
+  <tr>
+    <td class="tg-mejs">June</td>
+  </tr>
+  <tr>
+    <td class="tg-mejs">July</td>
+  </tr>
+  <tr>
+    <td class="tg-mejs">August</td>
+  </tr>
+  <tr>
+    <td class="tg-mejs">September</td>
+  </tr>
+  <tr>
+    <td class="tg-rqk3">October</td>
+  </tr>
+  <tr>
+    <td class="tg-rqk3">November</td>
+  </tr>
+  <tr>
+    <td class="tg-rqk3">December</td>
+  </tr>
+</table>
+<script>
+
+var margin = {top: 50, right: 20, bottom: 30, left: 40},
+    width = 660 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+//formatter = d3.format(".0%");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+    //.tickFormat(formatter);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("Boston_MNTH.csv", type, function(error, data) {
+  if (error) throw error;
+
+  x.domain(data.map(function(d) { return d.month; }));
+  y.domain([0, d3.max(data, function(d) { return d.crime; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Counts");
+
+  svg.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Boston : Total number of crime in each month");
+
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.month); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.crime); })
+      .attr("height", function(d) { return height - y(d.crime); })
+      .attr("fill",function(d){
+        if(d.month=="June"){
+          return "#FF0000";
+        } else if (d.month=="July"){
+          return "#FF0000";
+        } else if (d.month=="August"){
+          return "#FF0000";
+        } else if (d.month=="September"){
+          return "#FF0000";
+        } else{
+           return "#ff8533";
+        }
+      });
+});
+
+var svg1 = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("Philly_MNTH.csv", type, function(error, data) {
+  if (error) throw error;
+
+  x.domain(data.map(function(d) { return d.month; }));
+  y.domain([0, d3.max(data, function(d) { return d.crime; })]);
+
+  svg1.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg1.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Counts");
+
+      svg1.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Philadelphia : Total number of crime in each month");
+
+  svg1.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.month); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.crime); })
+      .attr("height", function(d) { return height - y(d.crime); })
+      .attr("fill",function(d){
+        if(d.month=="June"){
+          return "#FF0000";
+        } else if (d.month=="July"){
+          return "#FF0000";
+        } else if (d.month=="August"){
+          return "#FF0000";
+        } else if (d.month=="September"){
+          return "#FF0000";
+        } else{
+           return "#ff8533";
+        }
+      });
+});
+
+var svg2 = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("Chicago_MNTH.csv", type, function(error, data) {
+  if (error) throw error;
+
+  x.domain(data.map(function(d) { return d.month; }));
+  y.domain([0, d3.max(data, function(d) { return d.crime; })]);
+
+  svg2.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg2.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Counts");
+
+  svg2.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Chicago : Total number of crime in each month");
+
+  svg2.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.month); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.crime); })
+      .attr("height", function(d) { return height - y(d.crime); })
+      .attr("fill",function(d){
+        if(d.month=="June"){
+          return "#FF0000";
+        } else if (d.month=="July"){
+          return "#FF0000";
+        } else if (d.month=="August"){
+          return "#FF0000";
+        } else if (d.month=="September"){
+          return "#FF0000";
+        } else{
+           return "#ff8533";
+        }
+      });
+});
+
+var svg3 = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("Denver_MNTH.csv", type, function(error, data) {
+  if (error) throw error;
+
+  x.domain(data.map(function(d) { return d.month; }));
+  y.domain([0, d3.max(data, function(d) { return d.crime; })]);
+
+  svg3.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg3.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Counts");
+
+  svg3.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Denver : Total number of crime in each month");
+
+  svg3.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.month); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.crime); })
+      .attr("height", function(d) { return height - y(d.crime); })
+      .attr("fill",function(d){
+        if(d.month=="June"){
+          return "#FF0000";
+        } else if (d.month=="July"){
+          return "#FF0000";
+        } else if (d.month=="August"){
+          return "#FF0000";
+        } else if (d.month=="September"){
+          return "#FF0000";
+        } else{
+           return "#ff8533";
+        }
+      });
+});
+
+
+var svg4 = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("NY_MNTH.csv", type, function(error, data) {
+  if (error) throw error;
+
+  x.domain(data.map(function(d) { return d.month; }));
+  y.domain([0, d3.max(data, function(d) { return d.crime; })]);
+
+  svg4.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg4.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Counts");
+
+  svg4.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("New York : Total number of crime in each month");
+
+  svg4.selectAll(".bar")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.month); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.crime); })
+      .attr("height", function(d) { return height - y(d.crime); })
+      .attr("fill",function(d){
+        if(d.month=="June"){
+          return "#FF0000";
+        } else if (d.month=="July"){
+          return "#FF0000";
+        } else if (d.month=="August"){
+          return "#FF0000";
+        } else if (d.month=="September"){
+          return "#FF0000";
+        } else{
+           return "#ff8533";
+        }
+      });
+
+      
+});
+
+function type(d) {
+  d.crime = +d.crime;
+  return d;
+}
+
+</script>
