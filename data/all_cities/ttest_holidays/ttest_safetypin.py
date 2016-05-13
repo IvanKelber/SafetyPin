@@ -1,9 +1,11 @@
 '''
 This code will perform a two-tailed t-test for crime rate on holiday and average crime rate per day for a city.
 We choose significance level of 0.05
-We claim a null hypothesis that crime rate on holiday is same as average crime rate per day
-We propose an alternate hypothesis that crime rate on holiday varies from average crime rate per day
+We claim a null hypothesis that crime rate on holiday is greater than average crime rate per day
 We picked some holidays where we expect a significant trend. Some of them are federal holidays, some are observances.
+The input is 5 csv files, one for each city.
+Columns as listed: Holiday,average crime per day,average crime count year#1,average crime count year#2,average crime count year#3, ...
+p-values are stored in 5 csv files, one for each city
 The t-test should help to conclude which holidays are significant.
 This data can be leveraged in future to make more accurate crime predictions.
 '''
