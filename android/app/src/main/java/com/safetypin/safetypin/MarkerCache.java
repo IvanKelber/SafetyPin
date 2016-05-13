@@ -5,7 +5,9 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.LinkedList;
 
 /**
- * Created by Ivan on 4/28/2016.
+ * The MarkerCache object is simply a queue that can only store
+ * the specified number of google Markers.  If a new marker is added
+ * the other Marker is removed the map and the MarkerCache
  */
 public class MarkerCache<E> extends LinkedList<E> {
 

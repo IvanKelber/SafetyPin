@@ -12,7 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-
+/*
+This is the main activity that starts Safety Pin.  After the user has started
+the server, they enter the address into the text box and then press
+Brooklyn Demo, which will launcht the maps activity.
+*/
 public class MainActivity extends ActionBarActivity {
 
     @Override

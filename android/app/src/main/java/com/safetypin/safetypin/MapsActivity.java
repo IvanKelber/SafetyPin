@@ -28,6 +28,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
+
+/*
+This is the main google maps activity.  From here the user can pan a Google Map
+and select a location, either by clicking or by typing in the location.
+Once a location is selected a MyClientTask is started which contacts the server
+with the coordinates of the points.
+
+If the map is long clicked after receiving a path then all of the crime
+data received from the server will appear.
+*/
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, PlaceSelectionListener,
         GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 

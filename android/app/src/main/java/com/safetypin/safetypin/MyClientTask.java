@@ -20,7 +20,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
- * Created by Ivan on 1/21/2016.
+ * This is an asynchronous task that passes the user's location and destination
+ * to the server and receives the list of waypoints and crime locations.
+ * Once the waypoints and crimes have been received it starts # of waypoints / 23
+ * DirectionsFetcher tasks to plot the polyline on the graph.
+ * Lastly it plots the markers of the intersections (waypoints) and populates
+ * the list of crimes in the MapsActivity.
  */
 public class MyClientTask extends AsyncTask<Void, Void, Void> {
     String dstAddress;

@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Ivan on 4/29/2016.
+ * This is an asynchronous task that takes a list of locations as waypoints
+ * and plots the polyline on Google Maps.
  */
 public class DirectionsFetcher extends AsyncTask<LatLng, String, String> {
     private ArrayList<LatLng> locations = new ArrayList<>();

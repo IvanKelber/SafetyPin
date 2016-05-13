@@ -16,7 +16,8 @@ import android.view.View;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Created by Ivan on 5/10/2016.
+ * This is a fragment that appears when the server fails to calculate the data
+ * either due to missing data or locations that are out of bounds.
  */
 public class IntentFragment extends DialogFragment {
 
