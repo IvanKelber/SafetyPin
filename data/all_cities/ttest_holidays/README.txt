@@ -8,9 +8,9 @@ We have less than 30 samples (less than 30 years of data) so we picked t-test ov
 
 1. We choose significance level of 0.05.
 
-2. We claim a null hypothesis that crime rate on holiday is same as average crime rate per day.
+2. We claim a null hypothesis that crime rate on holiday is greater than average crime rate per day.
 3. 
-We propose an alternate hypothesis that crime rate on holiday varies from average crime rate per day.
+We propose an alternate hypothesis that crime rate on holiday is less than average crime rate per day.
 
 The t-test should help to conclude which holidays are significant.
 

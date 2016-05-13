@@ -34,7 +34,14 @@ AVERAGE_STREET_LENGTH = 0.024868578457151
 
 # CITY_BOUNDS = {"BOSTON":,"NEWYORK":,"CHICAGO":,"PHILADELPHIA",:"DENVER":}
 
+
 def extract_intersections(osm):
+"""
+This function is used to extract intersections and map them to relevant streeets 
+from osm files enabling us to create graphs of maps with intersections as nodes and 
+street segments as edges. The function is used while storing the information of cities 
+intially into the SQLite database.
+"""
     # This function takes an osm file as an input. It then goes through each xml 
     # element and searches for nodes that are shared by two or more ways.
     # While discovering intersections it will also store street information
